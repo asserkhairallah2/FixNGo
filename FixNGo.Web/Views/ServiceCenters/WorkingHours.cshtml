@@ -3,50 +3,384 @@
 @{
     ViewData["Title"] = "Manage Working Hours";
     var centerId = ViewContext.RouteData.Values["id"] ?? Context.Request.Query["id"];
+    var hoursList = Model?.ToList() ?? new List<FixNGo.Domain.Entities.WorkingHours>();
+
+    string[] dayNames = { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
+    string[] dayNamesAr = { "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت" };
+    string[] dayIcons = { "bi-sun", "bi-briefcase", "bi-briefcase", "bi-briefcase", "bi-briefcase", "bi-moon-stars", "bi-sun" };
 }
 
-<div class="container mt-4">
-    <h2>Manage Working Hours</h2>
+<style>
+    .wh-page {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    .wh-header {
+        background: linear-gradient(135deg, #1a1f2e 0%, #243447 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        color: white;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    .wh-header::before {
+        content: '';
+        position: absolute;
+        top: -40px; right: -40px;
+        width: 180px; height: 180px;
+        background: rgba(255, 165, 0, 0.08);
+        border-radius: 50%;
+    }
+    .wh-header::after {
+        content: '';
+        position: absolute;
+        bottom: -60px; left: -30px;
+        width: 220px; height: 220px;
+        background: rgba(255, 165, 0, 0.05);
+        border-radius: 50%;
+    }
+    .wh-header .badge-open {
+        background: rgba(34, 197, 94, 0.15);
+        color: #22c55e;
+        border: 1px solid rgba(34, 197, 94, 0.3);
+        font-size: 0.75rem;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+    .day-card {
+        background: var(--bs-body-bg, #fff);
+        border: 1px solid var(--bs-border-color, #dee2e6);
+        border-radius: 12px;
+        padding: 1.2rem 1.5rem;
+        margin-bottom: 0.75rem;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+    .day-card:hover {
+        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        transform: translateY(-1px);
+    }
+    .day-card.is-closed {
+        opacity: 0.7;
+        background: var(--bs-secondary-bg, #f8f9fa);
+    }
+    .day-icon {
+        width: 42px; height: 42px;
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+    .day-icon.weekday { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
+    .day-icon.friday  { background: rgba(34, 197, 94, 0.12);  color: #22c55e; }
+    .day-icon.weekend { background: rgba(249, 115, 22, 0.12); color: #f97316; }
 
+    .time-input {
+        border-radius: 8px;
+        border: 1px solid var(--bs-border-color, #ced4da);
+        padding: 0.5rem 0.75rem;
+        font-size: 0.95rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        background: var(--bs-body-bg, #fff);
+        color: var(--bs-body-color, #212529);
+        min-width: 130px;
+    }
+    .time-input:focus {
+        border-color: #f97316;
+        box-shadow: 0 0 0 3px rgba(249,115,22,0.15);
+        outline: none;
+    }
+    .time-input:disabled { opacity: 0.4; }
+
+    .closed-toggle {
+        width: 44px; height: 24px;
+        position: relative;
+        cursor: pointer;
+    }
+    .closed-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .slider {
+        position: absolute; inset: 0;
+        background: #ccc;
+        border-radius: 24px;
+        transition: 0.3s;
+    }
+    .slider:before {
+        content: '';
+        position: absolute;
+        height: 18px; width: 18px;
+        left: 3px; bottom: 3px;
+        background: white;
+        border-radius: 50%;
+        transition: 0.3s;
+    }
+    .closed-toggle input:checked + .slider { background: #ef4444; }
+    .closed-toggle input:checked + .slider:before { transform: translateX(20px); }
+
+    .summary-bar {
+        background: linear-gradient(135deg, rgba(249,115,22,0.08), rgba(59,130,246,0.08));
+        border: 1px solid rgba(249,115,22,0.2);
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .btn-save {
+        background: linear-gradient(135deg, #f97316, #ea580c);
+        border: none;
+        border-radius: 10px;
+        padding: 0.7rem 2rem;
+        font-weight: 600;
+        color: white;
+        transition: all 0.2s;
+        box-shadow: 0 4px 12px rgba(249,115,22,0.3);
+    }
+    .btn-save:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(249,115,22,0.4);
+        color: white;
+    }
+    .btn-back {
+        border-radius: 10px;
+        padding: 0.7rem 1.5rem;
+        font-weight: 500;
+    }
+    .tip-box {
+        background: rgba(59,130,246,0.06);
+        border-left: 3px solid #3b82f6;
+        border-radius: 0 8px 8px 0;
+        padding: 0.75rem 1rem;
+        font-size: 0.85rem;
+        color: var(--bs-secondary-color, #6c757d);
+    }
+    @@media (max-width: 576px) {
+        .day-card .row { flex-direction: column; gap: 0.5rem; }
+        .time-input { min-width: unset; width: 100%; }
+    }
+</style>
+
+<div class="wh-page">
+
+    {{-- Header --}}
+    <div class="wh-header mb-4">
+        <div class="d-flex align-items-center gap-3 mb-2" style="position:relative;z-index:1">
+            <div style="background:rgba(249,115,22,0.2);border-radius:12px;width:52px;height:52px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;">
+                <i class="bi bi-clock-history text-warning"></i>
+            </div>
+            <div>
+                <h4 class="mb-0 fw-bold">Working Hours Management</h4>
+                <p class="mb-0 text-white-50 small">FR-34 · Set your center's opening & closing times for each day</p>
+            </div>
+        </div>
+        <div class="d-flex gap-2 flex-wrap" style="position:relative;z-index:1">
+            <span class="badge-open"><i class="bi bi-check-circle me-1"></i>Active Schedule</span>
+            <span style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);font-size:0.75rem;padding:0.3rem 0.8rem;border-radius:20px;border:1px solid rgba(255,255,255,0.15)">
+                <i class="bi bi-geo-alt me-1"></i>Center #@centerId
+            </span>
+        </div>
+    </div>
+
+    {{-- Success / Error alerts --}}
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success">@TempData["Success"]</div>
+        <div class="alert border-0 rounded-3 d-flex align-items-center gap-2 mb-3" style="background:rgba(34,197,94,0.1);color:#16a34a;border-left:4px solid #22c55e!important">
+            <i class="bi bi-check-circle-fill fs-5"></i>
+            <span>@TempData["Success"]</span>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert border-0 rounded-3 d-flex align-items-center gap-2 mb-3" style="background:rgba(239,68,68,0.1);color:#dc2626;border-left:4px solid #ef4444!important">
+            <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+            <span>@TempData["Error"]</span>
+        </div>
     }
 
-    <form asp-action="WorkingHours" asp-route-id="@centerId" method="post">
+    {{-- Summary bar --}}
+    @{
+        int openDays = hoursList.Count(h => !h.IsClosed);
+        int closedDays = hoursList.Count(h => h.IsClosed);
+    }
+    <div class="summary-bar d-flex flex-wrap align-items-center gap-3 mb-3">
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-calendar-check text-success fs-5"></i>
+            <div>
+                <div class="fw-bold" style="font-size:1.1rem">@openDays <span class="fw-normal text-muted" style="font-size:0.85rem">open days</span></div>
+            </div>
+        </div>
+        <div class="vr d-none d-sm-block"></div>
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-calendar-x text-danger fs-5"></i>
+            <div>
+                <div class="fw-bold" style="font-size:1.1rem">@closedDays <span class="fw-normal text-muted" style="font-size:0.85rem">closed days</span></div>
+            </div>
+        </div>
+        <div class="vr d-none d-sm-block"></div>
+        <div class="d-flex align-items-center gap-2 ms-auto">
+            <i class="bi bi-info-circle text-primary"></i>
+            <span class="text-muted small">Toggle the red switch to mark a day as closed</span>
+        </div>
+    </div>
+
+    {{-- Main Form --}}
+    <form asp-action="WorkingHours" asp-route-id="@centerId" method="post" id="workingHoursForm">
         @Html.AntiForgeryToken()
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Day</th>
-                    <th>Opening Time</th>
-                    <th>Closing Time</th>
-                </tr>
-            </thead>
-            <tbody>
-                @{
-                    var hoursList = Model.ToList();
-                }
-                @for (int i = 0; i < hoursList.Count; i++)
-                {
-                    <tr>
-                        <td>
-                            <input type="hidden" asp-for="@hoursList[i].Id" />
-                            <input type="hidden" asp-for="@hoursList[i].ServiceCenterId" />
-                            <input type="hidden" asp-for="@hoursList[i].DayOfWeek" />
-                            @hoursList[i].DayOfWeek
-                        </td>
-                        <td>
-                            <input type="time" asp-for="@hoursList[i].OpenTime" class="form-control" />
-                        </td>
-                        <td>
-                            <input type="time" asp-for="@hoursList[i].CloseTime" class="form-control" />
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-        <a asp-action="Details" asp-route-id="@centerId" class="btn btn-secondary">Back to Details</a>
+
+        <div id="daysList">
+            @for (int i = 0; i < hoursList.Count; i++)
+            {
+                var day = hoursList[i];
+                int dayIdx = (int)day.DayOfWeek;
+                bool isFriday = day.DayOfWeek == DayOfWeek.Friday;
+                bool isWeekend = day.DayOfWeek == DayOfWeek.Saturday || day.DayOfWeek == DayOfWeek.Sunday;
+                string iconClass = isFriday ? "friday" : (isWeekend ? "weekend" : "weekday");
+                string icon = isFriday ? "bi-moon-stars" : (isWeekend ? "bi-sun" : "bi-briefcase");
+
+                <div class="day-card @(day.IsClosed ? "is-closed" : "")" id="dayCard_@i">
+
+                    {{-- Hidden fields --}}
+                    <input type="hidden" name="[@i].Id" value="@day.Id" />
+                    <input type="hidden" name="[@i].ServiceCenterId" value="@day.ServiceCenterId" />
+                    <input type="hidden" name="[@i].DayOfWeek" value="@((int)day.DayOfWeek)" />
+
+                    <div class="row align-items-center g-3">
+
+                        {{-- Day name --}}
+                        <div class="col-12 col-sm-3 d-flex align-items-center gap-3">
+                            <div class="day-icon @iconClass">
+                                <i class="bi @icon"></i>
+                            </div>
+                            <div>
+                                <div class="fw-semibold">@dayNames[dayIdx]</div>
+                                <div class="text-muted small">@dayNamesAr[dayIdx]</div>
+                            </div>
+                        </div>
+
+                        {{-- Open time --}}
+                        <div class="col-6 col-sm-3">
+                            <label class="form-label text-muted small mb-1"><i class="bi bi-sunrise me-1"></i>Opens</label>
+                            <input type="time"
+                                   name="[@i].OpenTime"
+                                   value="@day.OpenTime.ToString(@"hh\:mm")"
+                                   class="form-control time-input"
+                                   id="open_@i"
+                                   @(day.IsClosed ? "disabled" : "") />
+                        </div>
+
+                        {{-- Close time --}}
+                        <div class="col-6 col-sm-3">
+                            <label class="form-label text-muted small mb-1"><i class="bi bi-sunset me-1"></i>Closes</label>
+                            <input type="time"
+                                   name="[@i].CloseTime"
+                                   value="@day.CloseTime.ToString(@"hh\:mm")"
+                                   class="form-control time-input"
+                                   id="close_@i"
+                                   @(day.IsClosed ? "disabled" : "") />
+                        </div>
+
+                        {{-- Closed toggle --}}
+                        <div class="col-12 col-sm-3 d-flex align-items-center justify-content-sm-end gap-2">
+                            <span class="text-muted small closed-label-@i">@(day.IsClosed ? "Closed" : "Open")</span>
+                            <label class="closed-toggle" title="Mark as closed day">
+                                <input type="checkbox"
+                                       name="[@i].IsClosed"
+                                       value="true"
+                                       id="closed_@i"
+                                       @(day.IsClosed ? "checked" : "")
+                                       onchange="toggleDay(@i)" />
+                                <span class="slider"></span>
+                            </label>
+                            <input type="hidden" name="[@i].IsClosedHidden" value="@(day.IsClosed ? "true" : "false")" id="closedHidden_@i" />
+                        </div>
+
+                    </div>
+
+                    {{-- Duration indicator (when open) --}}
+                    @if (!day.IsClosed)
+                    {
+                        var duration = day.CloseTime - day.OpenTime;
+                        if (duration.TotalHours > 0)
+                        {
+                            <div class="mt-2 pt-2 border-top d-flex align-items-center gap-2 text-muted small open-duration-@i">
+                                <i class="bi bi-hourglass-split text-warning"></i>
+                                <span>Open for <strong>@((int)duration.TotalHours)h @(duration.Minutes > 0 ? duration.Minutes + "m" : "")</strong> on this day</span>
+                            </div>
+                        }
+                    }
+
+                </div>
+            }
+        </div>
+
+        {{-- Tip --}}
+        <div class="tip-box mb-4">
+            <i class="bi bi-lightbulb text-primary me-1"></i>
+            <strong>Tip:</strong> Customers will only be able to book appointments during your listed open hours.
+            Make sure your schedule is accurate so bookings are confirmed smoothly (SRS FR-32, FR-33).
+        </div>
+
+        {{-- Actions --}}
+        <div class="d-flex flex-wrap align-items-center gap-3 justify-content-between">
+            <a asp-action="Dashboard" class="btn btn-outline-secondary btn-back">
+                <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
+            </a>
+            <div class="d-flex gap-2 flex-wrap">
+                <button type="button" class="btn btn-outline-danger rounded-10" onclick="markAllClosed()" style="border-radius:10px;font-weight:500">
+                    <i class="bi bi-door-closed me-1"></i>Mark All Closed
+                </button>
+                <button type="button" class="btn btn-outline-success rounded-10" onclick="markAllOpen()" style="border-radius:10px;font-weight:500">
+                    <i class="bi bi-door-open me-1"></i>Open All Days
+                </button>
+                <button type="submit" class="btn btn-save">
+                    <i class="bi bi-floppy me-1"></i>Save Working Hours
+                </button>
+            </div>
+        </div>
+
     </form>
 </div>
+
+<script>
+    function toggleDay(i) {
+        const cb = document.getElementById('closed_' + i);
+        const card = document.getElementById('dayCard_' + i);
+        const openInput = document.getElementById('open_' + i);
+        const closeInput = document.getElementById('close_' + i);
+        const label = document.querySelector('.closed-label-' + i);
+
+        if (cb.checked) {
+            card.classList.add('is-closed');
+            openInput.disabled = true;
+            closeInput.disabled = true;
+            label.textContent = 'Closed';
+        } else {
+            card.classList.remove('is-closed');
+            openInput.disabled = false;
+            closeInput.disabled = false;
+            label.textContent = 'Open';
+        }
+    }
+
+    function markAllClosed() {
+        document.querySelectorAll('[id^="closed_"]').forEach((cb, i) => {
+            if (!cb.checked) { cb.checked = true; toggleDay(i); }
+        });
+    }
+
+    function markAllOpen() {
+        document.querySelectorAll('[id^="closed_"]').forEach((cb, i) => {
+            if (cb.checked) { cb.checked = false; toggleDay(i); }
+        });
+    }
+
+    // Animate cards on load
+    document.querySelectorAll('.day-card').forEach((card, i) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(12px)';
+        setTimeout(() => {
+            card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, i * 60);
+    });
+</script>
