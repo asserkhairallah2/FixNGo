@@ -362,6 +362,98 @@ public static class DbInitializer
                         await context.SaveChangesAsync();
                     }
                 }
+
+                // 6. Seed Demo Service Centers
+                if (!await context.ServiceCenters.AnyAsync())
+                {
+                    var centers = new List<ServiceCenter>
+                    {
+                        new ServiceCenter
+                        {
+                            Name = "مركز فيكس إن جو - المهندسين",
+                            NameEn = "FixNGo Auto Center - Mohandessin",
+                            Phone = "0223456789",
+                            Address = "26 شارع جامعة الدول العربية، المهندسين، الجيزة",
+                            Latitude = 30.0588,
+                            Longitude = 31.2119,
+                            VerificationStatus = VerificationStatus.Verified,
+                            IsActive = true,
+                            CommercialRegister = "CR-2024-001",
+                            Rating = 4.8m,
+                            TotalReviews = 112,
+                            Services = new List<Service>
+                            {
+                                new Service { Name = "فحص شامل للسيارة", Description = "فحص 50 نقطة يشمل المحرك والكهرباء والهيكل", Price = 250, EstimatedDurationMinutes = 60, IsActive = true },
+                                new Service { Name = "تغيير زيت المحرك", Description = "زيت محرك أصلي مع فلتر جديد", Price = 180, EstimatedDurationMinutes = 30, IsActive = true },
+                                new Service { Name = "فحص وإصلاح الفرامل", Description = "فحص كامل للتيل والجنط والبالونات", Price = 150, EstimatedDurationMinutes = 45, IsActive = true }
+                            },
+                            WorkingHours = Enum.GetValues<DayOfWeek>().Select(day => new WorkingHours
+                            {
+                                DayOfWeek = day,
+                                OpenTime = TimeSpan.FromHours(8),
+                                CloseTime = TimeSpan.FromHours(20),
+                                IsClosed = day == DayOfWeek.Friday
+                            }).ToList()
+                        },
+                        new ServiceCenter
+                        {
+                            Name = "مركز النيل للصيانة - مدينة نصر",
+                            NameEn = "Nile Auto Service - Nasr City",
+                            Phone = "0224567890",
+                            Address = "15 شارع عباس العقاد، مدينة نصر، القاهرة",
+                            Latitude = 30.0626,
+                            Longitude = 31.3424,
+                            VerificationStatus = VerificationStatus.Verified,
+                            IsActive = true,
+                            CommercialRegister = "CR-2024-002",
+                            Rating = 4.6m,
+                            TotalReviews = 87,
+                            Services = new List<Service>
+                            {
+                                new Service { Name = "إصلاح التكييف", Description = "شحن وإصلاح نظام تبريد الهواء", Price = 350, EstimatedDurationMinutes = 90, IsActive = true },
+                                new Service { Name = "كمبيوتر السيارة", Description = "قراءة وحذف الأكواد بالكمبيوتر", Price = 120, EstimatedDurationMinutes = 30, IsActive = true }
+                            },
+                            WorkingHours = Enum.GetValues<DayOfWeek>().Select(day => new WorkingHours
+                            {
+                                DayOfWeek = day,
+                                OpenTime = TimeSpan.FromHours(9),
+                                CloseTime = TimeSpan.FromHours(21),
+                                IsClosed = day == DayOfWeek.Sunday
+                            }).ToList()
+                        },
+                        new ServiceCenter
+                        {
+                            Name = "ورشة الصقر - 6 أكتوبر",
+                            NameEn = "Al-Saqr Workshop - 6th of October",
+                            Phone = "0238901234",
+                            Address = "المنطقة الصناعية الثالثة، 6 أكتوبر، الجيزة",
+                            Latitude = 29.9497,
+                            Longitude = 30.9196,
+                            VerificationStatus = VerificationStatus.Verified,
+                            IsActive = true,
+                            CommercialRegister = "CR-2024-003",
+                            Rating = 4.5m,
+                            TotalReviews = 64,
+                            Services = new List<Service>
+                            {
+                                new Service { Name = "بلاص الكاوتش", Description = "إصلاح وبلاص جميع أنواع الكاوتش", Price = 50, EstimatedDurationMinutes = 20, IsActive = true },
+                                new Service { Name = "ضبط الزوايا", Description = "ضبط وميزان العجلات بأحدث الأجهزة", Price = 200, EstimatedDurationMinutes = 45, IsActive = true },
+                                new Service { Name = "تغيير إطارات", Description = "تركيب وفك الإطارات لجميع السيارات", Price = 80, EstimatedDurationMinutes = 30, IsActive = true }
+                            },
+                            WorkingHours = Enum.GetValues<DayOfWeek>().Select(day => new WorkingHours
+                            {
+                                DayOfWeek = day,
+                                OpenTime = TimeSpan.FromHours(7),
+                                CloseTime = TimeSpan.FromHours(22),
+                                IsClosed = false
+                            }).ToList()
+                        }
+                    };
+
+                    await context.ServiceCenters.AddRangeAsync(centers);
+                    await context.SaveChangesAsync();
+                    logger?.LogInformation("Seeded {Count} demo service centers.", centers.Count);
+                }
             }
         }
         catch (Exception ex)

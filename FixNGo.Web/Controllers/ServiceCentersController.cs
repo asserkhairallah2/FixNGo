@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using FixNGo.Web.Models;
@@ -20,13 +20,6 @@ public class ServiceCentersController : Controller
         _serviceCenterRepository = serviceCenterRepository;
     }
 
-    // GET: /ServiceCenters
-    public async Task<IActionResult> Index(CancellationToken cancellationToken)
-    {
-        var centers = await _serviceCenterRepository.GetAllAsync(cancellationToken);
-        return View(centers);
-    }
-
     // GET: /ServiceCenters/Details/5
     public async Task<IActionResult> Details(int id, CancellationToken cancellationToken)
     {
@@ -43,12 +36,22 @@ public class ServiceCentersController : Controller
     public async Task<IActionResult> WorkingHours(int id, CancellationToken cancellationToken)
     {
         var center = await _serviceCenterRepository.GetByIdAsync(id, cancellationToken);
-        if (center == null)
+
+        // Return blank 7-day schedule when center doesn't exist yet so page still renders
+        if (center == null || !center.WorkingHours.Any())
         {
-            return NotFound();
+            var blank = Enum.GetValues<DayOfWeek>()
+                .Select(day => new FixNGo.Domain.Entities.WorkingHours
+                {
+                    ServiceCenterId = id,
+                    DayOfWeek = day,
+                    OpenTime = TimeSpan.FromHours(8),
+                    CloseTime = TimeSpan.FromHours(18)
+                }).ToList();
+            return View(blank);
         }
 
-        return View(center.WorkingHours); 
+        return View(center.WorkingHours);
     }
     // POST: /ServiceCenters/WorkingHours
     [HttpPost]
