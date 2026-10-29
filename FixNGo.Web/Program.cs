@@ -42,8 +42,9 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("AdminOnly", policy => policy.RequireRole(UserRole.Admin.ToString()));
 });
 
-// 5. MVC Controllers with Razor Views and SignalR
-builder.Services.AddControllersWithViews();
+// 5. MVC Controllers with Razor Views, RuntimeCompilation, and SignalR
+builder.Services.AddControllersWithViews()
+    .AddRazorRuntimeCompilation(); // views hot-reload without full rebuild
 builder.Services.AddSignalR();
 
 var app = builder.Build();
@@ -60,9 +61,12 @@ catch (Exception ex)
 }
 
 // 7. HTTP Request Pipeline
+// Always use a friendly error page — prevents raw exception dumps in all environments
+app.UseExceptionHandler("/Home/Error");
+app.UseStatusCodePagesWithReExecute("/Home/Error", "?statusCode={0}");
+
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
 
