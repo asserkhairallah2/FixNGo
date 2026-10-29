@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-
+  <ItemGroup>
     <ProjectReference Include="..\FixNGo.Application\FixNGo.Application.csproj" />
     <ProjectReference Include="..\FixNGo.Infrastructure\FixNGo.Infrastructure.csproj" />
   </ItemGroup>
@@ -17,7 +17,6 @@
   <ItemGroup>
     <Folder Include="ViewModels\" />
   </ItemGroup>
-
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
