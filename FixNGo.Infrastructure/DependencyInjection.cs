@@ -2,6 +2,7 @@ using System;
 using FixNGo.Application.Abstractions.Integrations;
 using FixNGo.Application.Abstractions.Persistence;
 using FixNGo.Application.Features.Assistance;
+using FixNGo.Application.Features.Provider;
 using FixNGo.Domain.Entities;
 using FixNGo.Infrastructure.Integrations;
 using FixNGo.Infrastructure.Persistence;
@@ -23,7 +24,7 @@ public static class DependencyInjection
     {
         // 1. Persistence - SQL Server DbContext Configuration
         string connectionString = configuration.GetConnectionString("DefaultConnection") 
-            ?? "Server=(localdb)\\mssqllocaldb;Database=FixNGoDb;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True";
+            ?? "Server=(localdb)\\mssqllocaldb;Database=FixNGo_UniversityDb;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True";
 
         services.AddDbContext<AppDbContext>((serviceProvider, options) =>
         {
@@ -55,6 +56,7 @@ public static class DependencyInjection
 
         // 5. Application Services
         services.AddScoped<IProviderMatchingService, ProviderMatchingService>();
+        services.AddScoped<IProviderService, ProviderService>();
 
         return services;
     }

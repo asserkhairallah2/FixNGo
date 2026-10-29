@@ -27,9 +27,9 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>, IAppDbContext
     public DbSet<Booking> Bookings => Set<Booking>();
     public DbSet<WorkingHours> WorkingHours => Set<WorkingHours>();
 
-    // Provider / Roadside Assistance Module DbSets
-    public DbSet<ProviderProfile> ProviderProfiles => Set<ProviderProfile>();
+    // Assistance Requests & Provider Profiles DbSets
     public DbSet<AssistanceRequest> AssistanceRequests => Set<AssistanceRequest>();
+    public DbSet<ProviderProfile> ProviderProfiles => Set<ProviderProfile>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

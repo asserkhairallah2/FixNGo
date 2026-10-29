@@ -6,7 +6,7 @@ using FixNGo.Domain.Entities;
 namespace FixNGo.Application.Abstractions.Persistence;
 
 /// <summary>
-/// Repository contract for retrieving and managing roadside service providers.
+/// Repository contract for retrieving and managing roadside service providers and their profiles.
 /// </summary>
 public interface IProviderRepository
 {

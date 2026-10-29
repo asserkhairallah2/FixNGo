@@ -33,19 +33,19 @@ public class ProviderRepository : IProviderRepository
 
     public async Task<ProviderProfile?> GetProfileByUserIdAsync(string userId, CancellationToken cancellationToken = default)
     {
-        return await _context.Set<ProviderProfile>()
+        return await _context.ProviderProfiles
+            .Include(p => p.User)
             .FirstOrDefaultAsync(p => p.UserId == userId, cancellationToken);
     }
 
     public async Task AddProfileAsync(ProviderProfile profile, CancellationToken cancellationToken = default)
     {
-        await _context.Set<ProviderProfile>().AddAsync(profile, cancellationToken);
+        await _context.ProviderProfiles.AddAsync(profile, cancellationToken);
     }
 
     public Task UpdateProfileAsync(ProviderProfile profile, CancellationToken cancellationToken = default)
     {
-        _context.Set<ProviderProfile>().Update(profile);
+        _context.ProviderProfiles.Update(profile);
         return Task.CompletedTask;
     }
 }
-
