@@ -15,6 +15,80 @@ namespace FixNGo.Infrastructure.Persistence;
 /// </summary>
 public static class DbInitializer
 {
+    private static async Task BaselineLegacyDatabaseAsync(AppDbContext context, ILogger? logger)
+    {
+        if (!await context.Database.CanConnectAsync())
+            return;
+
+        var connection = context.Database.GetDbConnection();
+        var wasClosed = connection.State != System.Data.ConnectionState.Open;
+        if (wasClosed)
+            await connection.OpenAsync();
+
+        try
+        {
+            async Task<bool> TableExistsAsync(string table)
+            {
+                using var cmd = connection.CreateCommand();
+                cmd.CommandText = $"SELECT CASE WHEN OBJECT_ID(N'dbo.[{table}]', N'U') IS NULL THEN 0 ELSE 1 END";
+                return Convert.ToInt32(await cmd.ExecuteScalarAsync()) == 1;
+            }
+
+            async Task ExecuteAsync(string sql)
+            {
+                using var cmd = connection.CreateCommand();
+                cmd.CommandText = sql;
+                await cmd.ExecuteNonQueryAsync();
+            }
+
+            var hasHistory = await TableExistsAsync("__EFMigrationsHistory");
+            if (hasHistory)
+            {
+                using var countCmd = connection.CreateCommand();
+                countCmd.CommandText = "SELECT COUNT(*) FROM [dbo].[__EFMigrationsHistory]";
+                if (Convert.ToInt32(await countCmd.ExecuteScalarAsync()) > 0)
+                    return; // normal migrated database
+            }
+
+            if (!await TableExistsAsync("AspNetUsers"))
+                return; // brand-new empty database, migrations will build everything
+
+            if (!hasHistory)
+            {
+                await ExecuteAsync(
+                    "CREATE TABLE [dbo].[__EFMigrationsHistory] (" +
+                    "[MigrationId] nvarchar(150) NOT NULL, [ProductVersion] nvarchar(32) NOT NULL, " +
+                    "CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId]))");
+            }
+
+            // A migration is marked as already applied only when the table it creates already exists.
+            var markers = new (string Suffix, string Table)[]
+            {
+                ("_InitialCreate", "AspNetUsers"),
+                ("_AddBookingTable", "Bookings"),
+                ("_AddProviderAndAssistanceRequests", "AssistanceRequests")
+            };
+
+            foreach (var migrationId in context.Database.GetMigrations())
+            {
+                foreach (var (suffix, table) in markers)
+                {
+                    if (migrationId.EndsWith(suffix, StringComparison.Ordinal) && await TableExistsAsync(table))
+                    {
+                        await ExecuteAsync(
+                            $"INSERT INTO [dbo].[__EFMigrationsHistory] ([MigrationId],[ProductVersion]) VALUES (N'{migrationId}', N'8.0.0')");
+                        logger?.LogInformation("Baselined existing database for migration {Migration}.", migrationId);
+                    }
+                }
+            }
+        }
+        finally
+        {
+            if (wasClosed)
+                await connection.CloseAsync();
+        }
+    }
+
     public static async Task SeedAsync(IServiceProvider serviceProvider)
     {
         using var scope = serviceProvider.CreateScope();
@@ -27,7 +101,10 @@ public static class DbInitializer
         {
             try
             {
-                // 0. Apply any pending EF Core migrations automatically
+                // 0. Apply any pending EF Core migrations automatically.
+                // Databases created earlier by EnsureCreated (no migration history) are baselined first,
+                // otherwise the migrations fail and tables like ProviderProfiles / AssistanceRequests are never created.
+                await BaselineLegacyDatabaseAsync(context, logger);
                 await context.Database.MigrateAsync();
             }
             catch (Exception migEx)
