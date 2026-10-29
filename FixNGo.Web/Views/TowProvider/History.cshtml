@@ -1,0 +1,113 @@
+@model IEnumerable<FixNGo.Web.ViewModels.TowHistoryItemViewModel>
+@{
+    ViewData["Title"] = "Tow History";
+}
+
+<!-- شريط التنقل المشترك -->
+<partial name="_TowNav" />
+
+<!-- عنوان الصفحة وعدد الرحلات -->
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold m-0">
+            <i class="bi bi-clock-history me-2" style="color:#fd7e14;"></i>Tow Missions History
+        </h3>
+        <p class="text-muted m-0">Review your completed towing dispatches, cancelled requests, and customer ratings.</p>
+    </div>
+    <span class="badge bg-secondary-subtle text-body fs-6 px-3 py-2">
+        Total Trips: @Model.Count()
+    </span>
+</div>
+
+<!-- جدول عرض سجل الرحلات -->
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-body-tertiary small text-uppercase text-muted">
+                    <tr>
+                        <th class="ps-4 py-3">Request Code</th>
+                        <th>Date & Time</th>
+                        <th>Customer & Vehicle</th>
+                        <th>Route (Pickup ➔ Dropoff)</th>
+                        <th>Distance</th>
+                        <th>Total Cost</th>
+                        <th>Status</th>
+                        <th class="pe-4">Customer Rating</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <!-- كود الطلب -->
+                            <td class="ps-4 fw-bold text-warning">#@item.RequestCode</td>
+
+                            <!-- التاريخ والوقت -->
+                            <td class="small text-muted">@item.Date.ToString("dd MMM yyyy, hh:mm tt")</td>
+
+                            <!-- بيانات العميل والسيارة -->
+                            <td>
+                                <div class="fw-bold">@item.CustomerName</div>
+                                <small class="text-muted"><i class="bi bi-car-front me-1"></i>@item.VehicleInfo</small>
+                            </td>
+
+                            <!-- نقطة الاستلام والوجهة -->
+                            <td class="small" style="max-width: 260px;">
+                                <div class="text-truncate">
+                                    <i class="bi bi-geo-alt-fill text-success me-1"></i><strong>From:</strong> @item.PickupLocation
+                                </div>
+                                <div class="text-truncate mt-1">
+                                    <i class="bi bi-flag-fill text-danger me-1"></i><strong>To:</strong> @item.DropoffLocation
+                                </div>
+                            </td>
+
+                            <!-- المسافة -->
+                            <td><span class="badge bg-body-secondary text-body">@item.TotalDistanceKm km</span></td>
+
+                            <!-- التكلفة -->
+                            <td class="fw-bold text-success">@item.TotalCost.ToString("N0") EGP</td>
+
+                            <!-- حالة الطلب -->
+                            <td>
+                                @if (item.Status == "COMPLETED")
+                                {
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                                        <i class="bi bi-check-circle-fill me-1"></i>Completed
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">
+                                        <i class="bi bi-x-circle-fill me-1"></i>Cancelled
+                                    </span>
+                                }
+                            </td>
+
+                            <!-- تقييم العميل والتعليق -->
+                            <td class="pe-4 small" style="max-width: 220px;">
+                                @if (item.CustomerRating.HasValue)
+                                {
+                                    <div class="text-warning mb-1">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            <i class="bi @(i <= item.CustomerRating.Value ? "bi-star-fill" : "bi-star")"></i>
+                                        }
+                                        <span class="text-muted ms-1">(@item.CustomerRating.Value/5)</span>
+                                    </div>
+                                    <div class="text-muted fst-italic text-truncate" title="@item.CustomerReviewComment">
+                                        "@(string.IsNullOrEmpty(item.CustomerReviewComment) ? "No comment" : item.CustomerReviewComment)"
+                                    </div>
+                                }
+                                else
+                                {
+                                    <span class="text-muted fst-italic">No rating — Cancelled</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

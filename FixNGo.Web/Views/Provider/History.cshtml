@@ -1,0 +1,134 @@
+@model IReadOnlyList<ProviderHistoryItemDto>
+@{
+    ViewData["Title"] = "Service History - FixNGo";
+    var currentFilter = ViewBag.CurrentStatusFilter as AssistanceRequestStatus?;
+}
+
+<div class="mb-4 pb-2 border-bottom">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1 small">
+            <li class="breadcrumb-item"><a asp-action="Dashboard" class="text-secondary text-decoration-none">Dashboard</a></li>
+            <li class="breadcrumb-item active text-body" aria-current="page">Service History</li>
+        </ol>
+    </nav>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+        <div>
+            <h2 class="fw-bold mb-1">Provider Mission History</h2>
+            <p class="text-secondary mb-0">Archived log of all completed, paid, and cancelled roadside rescues.</p>
+        </div>
+
+        <!-- Filter Pills & Search Form -->
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <form asp-action="History" method="get" class="d-flex align-items-center m-0">
+                @if (currentFilter.HasValue)
+                {
+                    <input type="hidden" name="status" value="@currentFilter.Value" />
+                }
+                <div class="input-group input-group-sm" style="max-width: 260px;">
+                    <input type="text" name="search" class="form-control" placeholder="Search driver or location..." value="@ViewBag.CurrentSearch" />
+                    <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+                    @if (!string.IsNullOrEmpty(ViewBag.CurrentSearch as string))
+                    {
+                        <a asp-action="History" asp-route-status="@currentFilter" class="btn btn-outline-danger" title="Clear search"><i class="bi bi-x"></i></a>
+                    }
+                </div>
+            </form>
+
+            <div class="btn-group" role="group" aria-label="Filter Missions">
+                <a asp-action="History" asp-route-status="" asp-route-search="@ViewBag.CurrentSearch" class="btn btn-sm @(!currentFilter.HasValue ? "btn-warning fw-bold" : "btn-outline-secondary")">
+                    All
+                </a>
+                <a asp-action="History" asp-route-status="@AssistanceRequestStatus.Completed" asp-route-search="@ViewBag.CurrentSearch" class="btn btn-sm @(currentFilter == AssistanceRequestStatus.Completed ? "btn-warning fw-bold" : "btn-outline-secondary")">
+                    Completed
+                </a>
+                <a asp-action="History" asp-route-status="@AssistanceRequestStatus.Cancelled" asp-route-search="@ViewBag.CurrentSearch" class="btn btn-sm @(currentFilter == AssistanceRequestStatus.Cancelled ? "btn-warning fw-bold" : "btn-outline-secondary")">
+                    Cancelled
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="card border bg-body-tertiary rounded-4 shadow-sm p-5 text-center">
+        <i class="bi bi-clock-history fs-1 text-secondary mb-3 d-block"></i>
+        <h4 class="fw-bold">No Records Found</h4>
+        <p class="text-secondary mb-0">There are no archived roadside assistance missions matching the selected filter.</p>
+    </div>
+}
+else
+{
+    <div class="d-flex flex-column gap-3">
+        @foreach (var item in Model)
+        {
+            <div class="card border bg-body-tertiary rounded-4 shadow-sm p-4">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="badge bg-secondary-subtle text-body border px-2 py-1">Ticket #@item.RequestId</span>
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">@item.ServiceType</span>
+                            @if (item.Status is AssistanceRequestStatus.Completed or AssistanceRequestStatus.Paid)
+                            {
+                                <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                    <i class="bi bi-check-circle-fill me-1"></i>Completed
+                                </span>
+                            }
+                            else if (item.Status == AssistanceRequestStatus.Cancelled)
+                            {
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle">
+                                    <i class="bi bi-x-circle-fill me-1"></i>Cancelled
+                                </span>
+                            }
+
+                            <span class="text-secondary small">
+                                <i class="bi bi-calendar3 me-1"></i>@item.Date.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
+                            </span>
+                        </div>
+
+                        <h5 class="fw-bold mb-1">
+                            <i class="bi bi-person-fill text-warning me-1"></i>Driver: @item.CustomerName
+                        </h5>
+                        <p class="text-secondary small mb-2">
+                            <i class="bi bi-geo-alt-fill text-danger me-1"></i>@item.CustomerAddress
+                        </p>
+
+                        @if (item.Status == AssistanceRequestStatus.Cancelled && !string.IsNullOrEmpty(item.CancellationReason))
+                        {
+                            <div class="p-2 rounded-2 bg-danger bg-opacity-10 border border-danger border-opacity-25 small text-danger mb-2">
+                                <strong>Cancellation Reason:</strong> @item.CancellationReason
+                            </div>
+                        }
+
+                        @if (item.Rating.HasValue)
+                        {
+                            <div class="d-flex align-items-center gap-2 mt-2">
+                                <span class="text-warning">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <i class="bi bi-star-fill @(i <= item.Rating.Value ? "text-warning" : "text-secondary") small"></i>
+                                    }
+                                </span>
+                                @if (!string.IsNullOrEmpty(item.ReviewText))
+                                {
+                                    <span class="text-secondary small fst-italic">"@item.ReviewText"</span>
+                                }
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Fare & Details -->
+                    <div class="text-md-end d-flex flex-row flex-md-column align-items-center align-items-md-end justify-content-between w-100 w-md-auto gap-2">
+                        <div>
+                            <span class="text-secondary small d-block">Mission Value</span>
+                            <span class="fw-bold fs-5 text-warning">@item.Fare.ToString("N0") EGP</span>
+                        </div>
+                        <a asp-action="RequestDetails" asp-route-id="@item.RequestId" class="btn btn-outline-secondary btn-sm px-3">
+                            View Ticket
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

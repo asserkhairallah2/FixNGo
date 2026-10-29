@@ -1,0 +1,188 @@
+@model FixNGo.Web.ViewModels.TowDashboardViewModel
+@{
+    ViewData["Title"] = "Tow Truck Dashboard";
+}
+
+<partial name="_TowNav" />
+
+<!-- Header & Online/Offline Toggle -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4 d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <h3 class="fw-bold m-0">@Model.ProviderName</h3>
+                @if (Model.IsVerified)
+                {
+                    <span class="badge bg-success-subtle text-success border border-success-subtle">
+                        <i class="bi bi-patch-check-fill me-1"></i>Verified Tow Partner
+                    </span>
+                }
+            </div>
+            <p class="text-muted m-0">
+                <i class="bi bi-truck-flatbed me-1 text-warning"></i>@Model.TruckType
+                <span class="mx-2">|</span>
+                <i class="bi bi-card-heading me-1"></i>Plate: <strong>@Model.PlateNumber</strong>
+            </p>
+        </div>
+
+        <form asp-controller="TowProvider" asp-action="ToggleAvailability" method="post" class="d-flex align-items-center gap-3">
+            <div class="text-end">
+                <div class="small text-muted">Dispatch Status</div>
+                @if (Model.IsOnline)
+                {
+                    <span class="fw-bold text-success"><i class="bi bi-broadcast me-1"></i>ONLINE (Receiving Requests)</span>
+                }
+                else
+                {
+                    <span class="fw-bold text-secondary"><i class="bi bi-slash-circle me-1"></i>OFFLINE</span>
+                }
+            </div>
+            <button type="submit" class="btn @(Model.IsOnline ? "btn-outline-danger" : "btn-success") fw-bold px-4 py-2 rounded-3">
+                <i class="bi @(Model.IsOnline ? "bi-power" : "bi-play-circle-fill") me-1"></i>
+                @(Model.IsOnline ? "Go Offline" : "Go Online")
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- KPI Summary Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3 col-sm-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted small">New Tow Requests</span>
+                    <i class="bi bi-bell-fill fs-4 text-warning"></i>
+                </div>
+                <h3 class="fw-bold m-0">@Model.PendingRequestsCount</h3>
+                <small class="text-muted">Waiting for response</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted small">Today's Earnings</span>
+                    <i class="bi bi-cash-stack fs-4 text-success"></i>
+                </div>
+                <h3 class="fw-bold m-0">@Model.TodayEarnings.ToString("N0") <small class="fs-6">EGP</small></h3>
+                <small class="text-success"><i class="bi bi-arrow-up-right"></i> Month: @Model.MonthlyEarnings.ToString("N0") EGP</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted small">Completed Tows</span>
+                    <i class="bi bi-check2-all fs-4 text-info"></i>
+                </div>
+                <h3 class="fw-bold m-0">@Model.CompletedTowsCount</h3>
+                <small class="text-muted">Total successful dispatches</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted small">Provider Rating</span>
+                    <i class="bi bi-star-fill fs-4 text-warning"></i>
+                </div>
+                <h3 class="fw-bold m-0">@Model.AverageRating.ToString("0.0") <small class="fs-6 text-muted">/ 5.0</small></h3>
+                <small class="text-muted">Based on @Model.TotalReviews customer reviews</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Active Tow Trip Banner (If Any) -->
+@if (Model.ActiveTow != null)
+{
+    <div class="card border-warning shadow-sm mb-4">
+        <div class="card-header bg-warning text-dark fw-bold d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-lightning-charge-fill me-1"></i>Active Tow Trip in Progress (#@Model.ActiveTow.RequestCode)</span>
+            <span class="badge bg-dark">@Model.ActiveTow.Status</span>
+        </div>
+        <div class="card-body">
+            <div class="row align-items-center g-3">
+                <div class="col-md-8">
+                    <h5 class="fw-bold mb-1">@Model.ActiveTow.VehicleMakeModel (@Model.ActiveTow.VehicleYear) - @Model.ActiveTow.CustomerName</h5>
+                    <p class="mb-2 text-muted small"><i class="bi bi-wrench me-1"></i>@Model.ActiveTow.ProblemType</p>
+                    <div class="d-flex flex-column gap-1 small">
+                        <div><i class="bi bi-record-circle text-success me-2"></i><strong>Pickup:</strong> @Model.ActiveTow.PickupAddress</div>
+                        <div><i class="bi bi-geo-alt-fill text-danger me-2"></i><strong>Destination:</strong> @Model.ActiveTow.DestinationAddress</div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <a asp-action="ActiveTow" asp-route-id="@Model.ActiveTow.Id" class="btn btn-emergency fw-bold px-4 py-2">
+                        <i class="bi bi-arrow-right-circle me-1"></i>Manage Active Tow
+                    </a>
+                    <a asp-action="Navigation" asp-route-id="@Model.ActiveTow.Id" class="btn btn-outline-secondary ms-2 py-2">
+                        <i class="bi bi-map me-1"></i>Map
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Incoming Tow Requests Preview -->
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-transparent py-3 d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold m-0"><i class="bi bi-inbox-fill me-2" style="color:#fd7e14;"></i>Incoming Nearby Tow Requests</h5>
+        <a asp-action="Requests" class="btn btn-sm btn-outline-emergency">View All Requests</a>
+    </div>
+    <div class="card-body">
+        @if (!Model.RecentNewRequests.Any())
+        {
+            <div class="text-center py-4 text-muted">
+                <i class="bi bi-check2-circle fs-1 d-block mb-2"></i>
+                No pending tow requests at the moment.
+            </div>
+        }
+        else
+        {
+            <div class="row g-3">
+                @foreach (var req in Model.RecentNewRequests)
+                {
+                    <div class="col-md-6">
+                        <div class="card h-100 @(req.IsEmergencyP0 ? "border-danger" : "border-secondary-subtle")">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        @if (req.IsEmergencyP0)
+                                        {
+                                            <span class="badge bg-danger mb-1"><i class="bi bi-exclamation-octagon-fill me-1"></i>P0 Emergency / Accident</span>
+                                        }
+                                        <h6 class="fw-bold m-0">@req.VehicleMakeModel (@req.VehicleYear)</h6>
+                                    </div>
+                                    <span class="fs-5 fw-bold text-success">@req.EstimatedPrice EGP</span>
+                                </div>
+                                <p class="small text-muted mb-2">@req.ProblemType</p>
+                                <div class="small mb-3">
+                                    <div class="text-truncate"><i class="bi bi-geo-fill text-warning me-1"></i><strong>From:</strong> @req.PickupAddress</div>
+                                    <div class="text-truncate"><i class="bi bi-flag-fill text-info me-1"></i><strong>To:</strong> @req.DestinationAddress</div>
+                                    <div class="mt-1 text-muted">
+                                        <i class="bi bi-signpost-split me-1"></i>Pickup: @req.DistanceToPickupKm km (@req.EstimatedEtaMinutes mins) | Tow Distance: @req.TowingDistanceKm km
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <form asp-action="AcceptRequest" asp-route-id="@req.Id" method="post" class="flex-grow-1">
+                                        <button type="submit" class="btn btn-emergency btn-sm w-100 fw-bold">
+                                            <i class="bi bi-check-lg me-1"></i>Accept Tow
+                                        </button>
+                                    </form>
+                                    <a asp-action="RequestDetails" asp-route-id="@req.Id" class="btn btn-outline-secondary btn-sm">
+                                        Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>

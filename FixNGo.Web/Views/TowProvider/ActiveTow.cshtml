@@ -1,0 +1,267 @@
+@model object
+@{
+    ViewData["Title"] = "Active Tow Mission";
+
+    // دالة ذكية لقراءة بيانات المهمة النشطة من الـ ViewModel بأمان
+    string GetProp(string fallback, params string[] propNames)
+    {
+        if (Model == null) return fallback;
+        var type = Model.GetType();
+        foreach (var name in propNames)
+        {
+            var prop = type.GetProperty(name);
+            if (prop != null)
+            {
+                var val = prop.GetValue(Model);
+                if (val != null && !string.IsNullOrWhiteSpace(val.ToString()))
+                    return val.ToString()!;
+            }
+        }
+        return fallback;
+    }
+
+    var requestCode = GetProp("TOW-9041", "RequestCode", "Code");
+    var customerName = GetProp("Ahmed Mahmoud", "CustomerName", "ClientName");
+    var customerPhone = GetProp("01012345678", "CustomerPhone", "PhoneNumber");
+    var vehicleMakeModel = GetProp("Hyundai Elantra 2022", "VehicleMakeModel", "VehicleInfo");
+    var vehiclePlate = GetProp("أ ب ج - 4512", "VehiclePlate", "PlateNumber");
+    var problemType = GetProp("Engine Overheating & Complete Breakdown", "ProblemType", "IssueDescription");
+    var towType = GetProp("Flatbed Tow Truck (ونش سطحة هيدروليك)", "TowTypeRequired", "TruckType");
+    var pickupAddress = GetProp("26th of July Corridor, Near Mall of Arabia, 6th of October", "PickupAddress", "PickupLocation");
+    var destinationAddress = GetProp("El-Safwa Auto Service Center, Industrial Zone, 6th of October", "DestinationAddress", "DropoffLocation");
+    var estimatedPrice = GetProp("650", "EstimatedPrice", "TotalCost", "Price");
+    var paymentMethod = GetProp("InstaPay / Cash", "PaymentMethod");
+    var etaMinutes = GetProp("12", "EstimatedEtaMinutes", "EtaMinutes");
+    var distanceKm = GetProp("8.4", "TowingDistanceKm", "TotalDistanceKm", "DistanceKm");
+}
+
+<!-- شريط التنقل المشترك -->
+<partial name="_TowNav" />
+
+<!-- عنوان الصفحة وحالة المهمة النشطة -->
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold m-0">
+            <i class="bi bi-gear-wide-connected me-2" style="color:#fd7e14;"></i>Active Tow Mission Control
+        </h3>
+        <p class="text-muted m-0">Update live towing stages, verify vehicle securing checklist, and coordinate with the customer.</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-warning text-dark fw-bold px-3 py-2 fs-6">
+            <i class="bi bi-lightning-charge-fill me-1"></i>IN PROGRESS
+        </span>
+        <span class="badge bg-dark px-3 py-2 fs-6">#@requestCode</span>
+    </div>
+</div>
+
+<!-- شريط مراحل رحلة السحب التفاعلي (Mission Progress Stepper) -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-transparent py-3 d-flex flex-wrap justify-content-between align-items-center">
+        <h5 class="fw-bold m-0">
+            <i class="bi bi-diagram-3-fill text-warning me-2"></i>Live Dispatch Stage (مراحل عملية الإنقاذ)
+        </h5>
+        <span id="stageBadge" class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-2">
+            Stage 2 of 4: Arrived at Pickup Location
+        </span>
+    </div>
+    <div class="card-body p-4">
+        <!-- شريط التقدم -->
+        <div class="progress mb-4" style="height: 12px;">
+            <div id="missionProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-warning" role="progressbar" style="width: 50%;"></div>
+        </div>
+
+        <!-- المراحل الأربعة -->
+        <div class="row g-3 text-center">
+            <div class="col-6 col-md-3">
+                <div id="stepCard1" class="p-3 rounded-3 border border-success bg-success-subtle text-success">
+                    <i class="bi bi-truck-flatbed fs-3 d-block mb-1"></i>
+                    <div class="fw-bold small">1. En Route</div>
+                    <small class="d-block opacity-75">في الطريق للعميل</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div id="stepCard2" class="p-3 rounded-3 border border-warning bg-warning-subtle text-warning-emphasis">
+                    <i class="bi bi-geo-alt-fill fs-3 d-block mb-1"></i>
+                    <div class="fw-bold small">2. Arrived & Winching</div>
+                    <small class="d-block opacity-75">الوصول ورفع السيارة</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div id="stepCard3" class="p-3 rounded-3 border bg-body-tertiary text-muted">
+                    <i class="bi bi-sign-turn-right-fill fs-3 d-block mb-1"></i>
+                    <div class="fw-bold small">3. Towing to Garage</div>
+                    <small class="d-block opacity-75">الـسحب نحو المركز</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div id="stepCard4" class="p-3 rounded-3 border bg-body-tertiary text-muted">
+                    <i class="bi bi-check2-circle fs-3 d-block mb-1"></i>
+                    <div class="fw-bold small">4. Drop-off & Done</div>
+                    <small class="d-block opacity-75">تسليم السيارة وإنهاء</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- أزرار تحديث المرحلة -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mt-4 pt-3 border-top gap-2">
+            <div class="small text-muted">
+                <i class="bi bi-clock-history text-warning me-1"></i>Estimated time to complete current step: <strong>~@etaMinutes mins</strong>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <a asp-action="Navigation" class="btn btn-outline-secondary">
+                    <i class="bi bi-map me-1"></i>Open Live Map
+                </a>
+                <button type="button" id="advanceStageBtn" onclick="advanceTowStage()" class="btn btn-warning text-dark fw-bold px-4">
+                    <i class="bi bi-arrow-right-circle-fill me-1"></i>Confirm Vehicle Loaded (Start Towing)
+                </button>
+                <a id="finishMissionBtn" asp-action="History" class="btn btn-success fw-bold px-4 d-none">
+                    <i class="bi bi-check2-all me-1"></i>View in Completed History
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- العمود الأيسر: بيانات العميل والعربية والمسار -->
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent py-3 fw-bold">
+                <i class="bi bi-car-front-fill text-warning me-2"></i>Customer & Disabled Vehicle Details
+            </div>
+            <div class="card-body p-4">
+                <div class="d-flex flex-wrap justify-content-between align-items-center p-3 rounded-3 bg-body-tertiary mb-4">
+                    <div>
+                        <span class="text-muted small d-block">Customer Name</span>
+                        <h5 class="fw-bold m-0">@customerName</h5>
+                        <small class="text-muted"><i class="bi bi-telephone me-1"></i>@customerPhone</small>
+                    </div>
+                    <div class="d-flex gap-2 mt-2 mt-sm-0">
+                        <a href="tel:@customerPhone" class="btn btn-success btn-sm px-3">
+                            <i class="bi bi-telephone-fill me-1"></i>Call Customer
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4 small">
+                    <div class="col-sm-6">
+                        <div class="p-3 border rounded-3 h-100">
+                            <div class="text-muted">VEHICLE MAKE & MODEL</div>
+                            <div class="fw-bold fs-6 mt-1">@vehicleMakeModel</div>
+                            <span class="badge bg-secondary-subtle text-body mt-1">Plate: @vehiclePlate</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 border rounded-3 h-100">
+                            <div class="text-muted">REPORTED BREAKDOWN</div>
+                            <div class="fw-bold text-danger-emphasis mt-1">@problemType</div>
+                            <small class="text-muted d-block mt-1">@towType</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- تفاصيل نقطتي الاستلام والتسليم -->
+                <div class="p-3 rounded-3 bg-body-tertiary border-start border-success border-4 mb-3">
+                    <div class="small text-muted fw-bold">PICKUP LOCATION (نقطة الاستلام)</div>
+                    <div class="fw-semibold mt-1"><i class="bi bi-geo-alt-fill text-success me-1"></i>@pickupAddress</div>
+                </div>
+
+                <div class="p-3 rounded-3 bg-body-tertiary border-start border-danger border-4">
+                    <div class="small text-muted fw-bold">DROP-OFF DESTINATION (مركز الصيانة / الوجهة)</div>
+                    <div class="fw-semibold mt-1"><i class="bi bi-flag-fill text-danger me-1"></i>@destinationAddress</div>
+                    <div class="small text-muted mt-1">Total Towing Distance: <strong>@distanceKm km</strong></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- العمود الأيمن: قائمة فحص الأمان وتفاصيل الحساب -->
+    <div class="col-lg-5">
+        <!-- قائمة فحص الأمان قبل السحب -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent py-3 fw-bold">
+                <i class="bi bi-shield-check text-warning me-2"></i>Safety & Winching Checklist (فحص الأمان)
+            </div>
+            <div class="card-body p-4">
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="check1" checked>
+                    <label class="form-check-label small fw-semibold" for="check1">
+                        Hazard lights & safety cones deployed (تشغيل الانتظار وأقماع الأمان)
+                    </label>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="check2" checked>
+                    <label class="form-check-label small fw-semibold" for="check2">
+                        Pre-tow vehicle condition photos captured (تصوير حالة السيارة قبل الرفع)
+                    </label>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="check3" checked>
+                    <label class="form-check-label small fw-semibold" for="check3">
+                        Winch cable & 4-point wheel straps locked (تأمين أحزمة الإطارات والواير)
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="check4">
+                    <label class="form-check-label small fw-semibold" for="check4">
+                        Handbrake released / Neutral gear verified (التأكد من المور وفرامل اليد)
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- كارت التكلفة والتحصيل -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent py-3 fw-bold">
+                <i class="bi bi-cash-stack text-warning me-2"></i>Payout Summary (تفاصيل التكلفة)
+            </div>
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-2 small">
+                    <span class="text-muted">Payment Method:</span>
+                    <span class="badge bg-primary-subtle text-primary">@paymentMethod</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted">Total Tow Fare:</span>
+                    <span class="fs-3 fw-bold text-success">@estimatedPrice <small class="fs-6">EGP</small></span>
+                </div>
+                <div class="alert alert-warning small m-0 py-2">
+                    <i class="bi bi-info-circle-fill me-1"></i>Collect fare or confirm digital transfer upon arrival at the drop-off garage.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- سكريبت تفاعلي لتجربة تحريك مراحل السحب مباشرة في الصفحة -->
+<script>
+    let currentStep = 2;
+    function advanceTowStage() {
+        const bar = document.getElementById('missionProgressBar');
+        const badge = document.getElementById('stageBadge');
+        const btn = document.getElementById('advanceStageBtn');
+        const finishBtn = document.getElementById('finishMissionBtn');
+        const step2 = document.getElementById('stepCard2');
+        const step3 = document.getElementById('stepCard3');
+        const step4 = document.getElementById('stepCard4');
+
+        if (currentStep === 2) {
+            currentStep = 3;
+            bar.style.width = '75%';
+            badge.textContent = 'Stage 3 of 4: Towing Vehicle to Destination Garage';
+            step2.className = 'p-3 rounded-3 border border-success bg-success-subtle text-success';
+            step3.className = 'p-3 rounded-3 border border-warning bg-warning-subtle text-warning-emphasis';
+            btn.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i>Confirm Arrival & Complete Drop-off';
+        } else if (currentStep === 3) {
+            currentStep = 4;
+            bar.style.width = '100%';
+            bar.classList.remove('bg-warning', 'progress-bar-animated');
+            bar.classList.add('bg-success');
+            badge.className = 'badge bg-success-subtle text-success border border-success-subtle px-3 py-2';
+            badge.textContent = 'Stage 4 of 4: Mission Completed Successfully!';
+            step3.className = 'p-3 rounded-3 border border-success bg-success-subtle text-success';
+            step4.className = 'p-3 rounded-3 border border-success bg-success-subtle text-success';
+            btn.classList.add('d-none');
+            finishBtn.classList.remove('d-none');
+        }
+    }
+</script>

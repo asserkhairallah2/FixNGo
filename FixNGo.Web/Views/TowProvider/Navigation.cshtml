@@ -1,0 +1,168 @@
+@model object
+@{
+    ViewData["Title"] = "Navigation Map";
+
+    // دالة ذكية لقراءة بيانات الرحلة الحالية من الـ ViewModel في الـ Controller
+    string GetProp(string fallback, params string[] propNames)
+    {
+        if (Model == null) return fallback;
+        var type = Model.GetType();
+        foreach (var name in propNames)
+        {
+            var prop = type.GetProperty(name);
+            if (prop != null)
+            {
+                var val = prop.GetValue(Model);
+                if (val != null && !string.IsNullOrWhiteSpace(val.ToString()))
+                    return val.ToString()!;
+            }
+        }
+        return fallback;
+    }
+
+    var requestCode = GetProp("TOW-9041", "RequestCode", "ActiveRequestCode", "Code");
+    var customerName = GetProp("Ahmed Mahmoud", "CustomerName", "ClientName");
+    var customerPhone = GetProp("01012345678", "CustomerPhone", "PhoneNumber", "Phone");
+    var vehicleInfo = GetProp("Hyundai Elantra 2022 (أ ب ج - 4512)", "VehicleInfo", "VehicleMakeModel", "Vehicle");
+    var pickupAddress = GetProp("26th of July Corridor, Near Mall of Arabia, 6th of October", "PickupAddress", "PickupLocation", "CurrentLocation");
+    var destinationAddress = GetProp("El-pha Mechanic Center, Industrial Zone, 6th of October", "DestinationAddress", "DropoffLocation", "Destination");
+    var distanceKm = GetProp("8.4", "RemainingDistanceKm", "DistanceKm", "TotalDistanceKm", "TowingDistanceKm");
+    var etaMinutes = GetProp("14", "EstimatedEtaMinutes", "EtaMinutes", "RemainingMinutes");
+    var currentStage = GetProp("Heading to Pickup Location", "CurrentStage", "Status", "NavigationStage");
+}
+
+<!-- شريط التنقل المشترك -->
+<partial name="_TowNav" />
+
+<!-- عنوان الصفحة وحالة التوجيه المباشر -->
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold m-0">
+            <i class="bi bi-geo-alt-fill me-2" style="color:#fd7e14;"></i>Live GPS Navigation & Route
+        </h3>
+        <p class="text-muted m-0">Real-time route guidance from your tow truck to the customer pickup point and destination garage.</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-success px-3 py-2 fs-6">
+            <i class="bi bi-broadcast me-1"></i>GPS Signal: Strong
+        </span>
+        <span class="badge bg-dark px-3 py-2 fs-6">#@requestCode</span>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- العمود الأيسر: الخريطة التفاعلية وشريط المسافة والوقت -->
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm overflow-hidden">
+            <!-- شريط معلومات الملاحة العلوي -->
+            <div class="card-header bg-dark text-white p-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-warning text-dark fw-bold px-3 py-2">
+                        <i class="bi bi-sign-turn-right-fill me-1"></i>@currentStage
+                    </span>
+                </div>
+                <div class="d-flex gap-4 small">
+                    <div>
+                        <span class="text-white-50">Remaining Distance:</span>
+                        <strong class="text-warning ms-1 fs-6">@distanceKm km</strong>
+                    </div>
+                    <div>
+                        <span class="text-white-50">Est. Arrival (ETA):</span>
+                        <strong class="text-info ms-1 fs-6">@etaMinutes mins</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- الخريطة التفاعلية (OpenStreetMap) -->
+            <div class="position-relative" style="height: 430px;">
+                <iframe 
+                    width="100%" 
+                    height="100%" 
+                    style="border:0; filter: contrast(1.05);" 
+                    loading="lazy" 
+                    allowfullscreen 
+                    src="https://www.openstreetmap.org/export/embed.html?bbox=30.9100%2C29.9500%2C31.0500%2C30.0400&amp;layer=mapnik&amp;marker=29.9950%2C30.9750">
+                </iframe>
+            </div>
+
+            <!-- أزرار التحكم السريع بالخريطة -->
+            <div class="card-footer bg-body-tertiary p-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <div class="small text-muted">
+                    <i class="bi bi-info-circle me-1 text-warning"></i>Traffic is moderate along 26th of July Corridor. Fastest route selected.
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="https://www.google.com/maps/dir/?api=1&destination=6th+of+October+City+Giza" target="_blank" class="btn btn-warning text-dark fw-bold btn-sm px-3">
+                        <i class="bi bi-box-arrow-up-right me-1"></i>Open in Google Maps
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- العمود الأيمن: تفاصيل المسار وخطوات السير وبيانات العميل -->
+    <div class="col-lg-4">
+        <!-- كارت نقطتي الاستلام والوصول -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent py-3 fw-bold">
+                <i class="bi bi-signpost-split-fill text-warning me-2"></i>Route Waypoints (نقاط المسار)
+            </div>
+            <div class="card-body p-3">
+                <div class="p-3 rounded-3 bg-body-tertiary mb-3 border-start border-success border-4">
+                    <div class="text-muted small fw-bold text-uppercase">1. Pickup Point (نقطة الاستلام)</div>
+                    <div class="fw-semibold mt-1"><i class="bi bi-geo-alt-fill text-success me-1"></i>@pickupAddress</div>
+                </div>
+
+                <div class="p-3 rounded-3 bg-body-tertiary border-start border-danger border-4">
+                    <div class="text-muted small fw-bold text-uppercase">2. Drop-off Garage (وجهة التسليم)</div>
+                    <div class="fw-semibold mt-1"><i class="bi bi-flag-fill text-danger me-1"></i>@destinationAddress</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- كارت إرشادات الطريق خطوة بخطوة -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent py-3 fw-bold">
+                <i class="bi bi-Compass text-warning me-2"></i>Turn-by-Turn Directions
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush small">
+                    <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                        <div>
+                            <i class="bi bi-arrow-up-circle-fill text-success me-2 fs-6"></i>
+                            <strong>Continue straight</strong> on Central Axis
+                        </div>
+                        <span class="badge bg-body-secondary text-body">3.2 km</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                        <div>
+                            <i class="bi bi-sign-turn-right-fill text-warning me-2 fs-6"></i>
+                            <strong>Take exit right</strong> toward Mall of Arabia
+                        </div>
+                        <span class="badge bg-body-secondary text-body">4.0 km</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                        <div>
+                            <i class="bi bi-geo-fill text-danger me-2 fs-6"></i>
+                            <strong>Arrive at Pickup</strong> on right shoulder
+                        </div>
+                        <span class="badge bg-body-secondary text-body">1.2 km</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- كارت التواصل السريع مع العميل -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-3 d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="small text-muted">Customer Waiting</div>
+                    <div class="fw-bold">@customerName</div>
+                    <div class="small text-muted">@vehicleInfo</div>
+                </div>
+                <a href="tel:@customerPhone" class="btn btn-outline-success btn-sm px-3">
+                    <i class="bi bi-telephone-fill me-1"></i>Call
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

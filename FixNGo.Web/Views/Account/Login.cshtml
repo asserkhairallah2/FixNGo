@@ -1,0 +1,61 @@
+@{
+    ViewData["Title"] = "Sign In - FixNGo";
+    var returnUrl = ViewData["ReturnUrl"] as string;
+}
+
+<div class="row justify-content-center my-5">
+    <div class="col-md-6 col-lg-5">
+        <div class="card border bg-body-tertiary rounded-4 shadow-sm p-4 p-md-5">
+            <div class="text-center mb-4">
+                <a class="navbar-brand fs-3 fw-bold" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-wrench-adjustable-circle me-1" style="color: #fd7e14;"></i><span>Fix</span><span style="color: #fd7e14;">N</span><span>Go</span>
+                </a>
+                <h4 class="fw-bold mt-2">Sign In to Your Account</h4>
+                <p class="text-secondary small">Access provider portal, service centers, and roadside rescue</p>
+            </div>
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger border-0 small rounded-3 p-3 mb-3">
+                    <div asp-validation-summary="All" class="mb-0"></div>
+                </div>
+            }
+
+            <form asp-action="Login" asp-route-returnUrl="@returnUrl" method="post" class="mb-4">
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    <label for="email" class="form-label fw-semibold small">Email Address</label>
+                    <input type="email" name="email" id="email" class="form-control" placeholder="name@example.com" required autofocus />
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label fw-semibold small">Password</label>
+                    <input type="password" name="password" id="password" class="form-control" placeholder="••••••••" required />
+                </div>
+
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="rememberMe" id="rememberMe" value="true" />
+                    <label class="form-check-label small" for="rememberMe">Remember me on this browser</label>
+                </div>
+
+                <button type="submit" class="btn btn-emergency w-100 py-2 fw-bold shadow">
+                    Sign In
+                </button>
+            </form>
+
+            <!-- Quick Demo One-Click Access -->
+            <div class="pt-3 border-top">
+                <span class="text-secondary small fw-bold d-block text-center mb-2">QUICK DEMO ONE-CLICK SIGN IN</span>
+                <div class="d-flex flex-column gap-2">
+                    <a asp-action="QuickLogin" asp-route-role="Provider" class="btn btn-outline-warning btn-sm fw-semibold">
+                        <i class="bi bi-person-gear me-1"></i> Sign In as Demo Provider (Mohamed Mansour)
+                    </a>
+                    <a asp-action="QuickLogin" asp-route-role="Customer" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-person me-1"></i> Sign In as Demo Customer (Tarek Mostafa)
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

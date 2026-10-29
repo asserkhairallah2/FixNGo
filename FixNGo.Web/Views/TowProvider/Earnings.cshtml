@@ -1,0 +1,225 @@
+@model object
+@{
+    ViewData["Title"] = "Earnings & Wallet";
+
+    // دالة ذكية لقراءة أرقام الأرباح والمحفظة من الـ ViewModel
+    string GetProp(string fallback, params string[] propNames)
+    {
+        if (Model == null) return fallback;
+        var type = Model.GetType();
+        foreach (var name in propNames)
+        {
+            var prop = type.GetProperty(name);
+            if (prop != null)
+            {
+                var val = prop.GetValue(Model);
+                if (val != null && !string.IsNullOrWhiteSpace(val.ToString()))
+                    return val.ToString()!;
+            }
+        }
+        return fallback;
+    }
+
+    var todayEarnings = GetProp("1,200", "TodayEarnings", "TodaysEarnings", "DailyEarnings");
+    var weeklyEarnings = GetProp("6,450", "WeeklyEarnings", "ThisWeekEarnings");
+    var monthlyEarnings = GetProp("24,800", "MonthlyEarnings", "ThisMonthEarnings", "TotalEarnings");
+    var availableBalance = GetProp("4,350", "AvailableBalance", "WalletBalance", "WithdrawableBalance");
+    var completedTrips = GetProp("38", "CompletedTripsCount", "TotalCompletedTrips", "CompletedTrips");
+    var cashCollected = GetProp("14,200", "CashCollected", "CashEarnings");
+    var walletPayouts = GetProp("10,600", "DigitalEarnings", "OnlineEarnings", "CardEarnings");
+}
+
+<!-- شريط التنقل المشترك -->
+<partial name="_TowNav" />
+
+<!-- عنوان الصفحة وزرار سحب الرصيد -->
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold m-0">
+            <i class="bi bi-wallet2 me-2" style="color:#fd7e14;"></i>Earnings & Financial Wallet
+        </h3>
+        <p class="text-muted m-0">Track your daily towing revenue, InstaPay/Vodafone Cash payouts, and transaction history.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fs-6">
+            <i class="bi bi-shield-check me-1"></i>Payout Account: Verified (InstaPay)
+        </span>
+    </div>
+</div>
+
+<!-- كروت ملخص الأرباح الأربعة -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted small text-uppercase fw-bold">Today's Revenue</span>
+                    <span class="badge bg-success-subtle text-success rounded-pill p-2"><i class="bi bi-cash-coin fs-5"></i></span>
+                </div>
+                <h3 class="fw-bold mb-1 text-success">@todayEarnings <small class="fs-6">EGP</small></h3>
+                <small class="text-muted">Updated immediately after drop-off</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted small text-uppercase fw-bold">This Week</span>
+                    <span class="badge bg-warning-subtle text-warning rounded-pill p-2"><i class="bi bi-graph-up-arrow fs-5"></i></span>
+                </div>
+                <h3 class="fw-bold mb-1">@weeklyEarnings <small class="fs-6">EGP</small></h3>
+                <small class="text-success"><i class="bi bi-arrow-up-right"></i> +14% vs last week</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted small text-uppercase fw-bold">Monthly Earnings</span>
+                    <span class="badge bg-info-subtle text-info rounded-pill p-2"><i class="bi bi-calendar-check fs-5"></i></span>
+                </div>
+                <h3 class="fw-bold mb-1">@monthlyEarnings <small class="fs-6">EGP</small></h3>
+                <small class="text-muted">Across @completedTrips completed dispatches</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100 border-start border-warning border-4">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted small text-uppercase fw-bold">Available to Withdraw</span>
+                    <span class="badge bg-warning text-dark rounded-pill p-2"><i class="bi bi-bank fs-5"></i></span>
+                </div>
+                <h3 class="fw-bold mb-1 text-warning">@availableBalance <small class="fs-6">EGP</small></h3>
+                <small class="text-muted">Ready for instant transfer</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- العمود الأيسر: جدول المعاملات المالية الأخيرة -->
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent py-3 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold m-0"><i class="bi bi-receipt-cutoff text-warning me-2"></i>Recent Trip Payouts & Transactions</h5>
+                <span class="badge bg-body-secondary text-body">Zero Platform Delay</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-body-tertiary small text-uppercase text-muted">
+                            <tr>
+                                <th class="ps-4 py-3">Transaction ID</th>
+                                <th>Date</th>
+                                <th>Trip / Description</th>
+                                <th>Payment Method</th>
+                                <th>Net Amount</th>
+                                <th class="pe-4">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="ps-4 fw-bold text-warning">#TRX-5091</td>
+                                <td class="small text-muted">29 Oct 2026</td>
+                                <td>
+                                    <div class="fw-semibold">Tow Dispatch #TOW-8790</div>
+                                    <small class="text-muted">Ring Road ➔ Master Fix Garage (11.2 km)</small>
+                                </td>
+                                <td><span class="badge bg-primary-subtle text-primary">InstaPay / Card</span></td>
+                                <td class="fw-bold text-success">+500 EGP</td>
+                                <td class="pe-4"><span class="badge bg-success-subtle text-success">Settled</span></td>
+                            </tr>
+                            <tr>
+                                <td class="ps-4 fw-bold text-warning">#TRX-5088</td>
+                                <td class="small text-muted">28 Oct 2026</td>
+                                <td>
+                                    <div class="fw-semibold">Tow Dispatch #TOW-8744</div>
+                                    <small class="text-muted">Faisal St ➔ Toyota Center (16.8 km)</small>
+                                </td>
+                                <td><span class="badge bg-secondary-subtle text-body">Cash Paid</span></td>
+                                <td class="fw-bold text-success">+700 EGP</td>
+                                <td class="pe-4"><span class="badge bg-success-subtle text-success">Collected</span></td>
+                            </tr>
+                            <tr>
+                                <td class="ps-4 fw-bold text-warning">#TRX-5079</td>
+                                <td class="small text-muted">26 Oct 2026</td>
+                                <td>
+                                    <div class="fw-semibold">Tow Dispatch #TOW-8699</div>
+                                    <small class="text-muted">26th July Corridor ➔ Bosch Service (8.5 km)</small>
+                                </td>
+                                <td><span class="badge bg-primary-subtle text-primary">Vodafone Cash</span></td>
+                                <td class="fw-bold text-success">+450 EGP</td>
+                                <td class="pe-4"><span class="badge bg-success-subtle text-success">Settled</span></td>
+                            </tr>
+                            <tr>
+                                <td class="ps-4 fw-bold text-warning">#TRX-5065</td>
+                                <td class="small text-muted">24 Oct 2026</td>
+                                <td>
+                                    <div class="fw-semibold">Weekly Wallet Withdrawal</div>
+                                    <small class="text-muted">Transferred to InstaPay Account</small>
+                                </td>
+                                <td><span class="badge bg-warning-subtle text-warning">Bank / InstaPay</span></td>
+                                <td class="fw-bold text-info">2,800 EGP</td>
+                                <td class="pe-4"><span class="badge bg-info-subtle text-info">Transferred</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- العمود الأيمن: تقسيمة الكاش والمحفظة وطلب سحب الرصيد -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent py-3 fw-bold">
+                <i class="bi bi-pie-chart-fill text-warning me-2"></i>Payment Breakdown (تفصيل التحصيل)
+            </div>
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <div class="text-muted small">Direct Cash Collected</div>
+                        <div class="fw-bold fs-5">@cashCollected EGP</div>
+                    </div>
+                    <i class="bi bi-cash-stack fs-2 text-success"></i>
+                </div>
+                <hr class="text-muted" />
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small">Digital / Wallet Transfers</div>
+                        <div class="fw-bold fs-5">@walletPayouts EGP</div>
+                    </div>
+                    <i class="bi bi-phone-flip fs-2 text-primary"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- كارت سحب الرصيد -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent py-3 fw-bold">
+                <i class="bi bi-send-check-fill text-warning me-2"></i>Instant Payout Request
+            </div>
+            <div class="card-body p-4">
+                <p class="small text-muted mb-3">
+                    Transfer your available digital wallet balance (<strong>@availableBalance EGP</strong>) directly to your registered Vodafone Cash or InstaPay account.
+                </p>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Payout Method</label>
+                    <select class="form-select form-select-sm">
+                        <option selected>InstaPay (Linked to 010•••••••)</option>
+                        <option>Vodafone Cash Wallet</option>
+                    </select>
+                </div>
+                <a asp-action="Earnings" class="btn btn-warning text-dark fw-bold w-100">
+                    <i class="bi bi-lightning-charge-fill me-1"></i>Withdraw @availableBalance EGP Now
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

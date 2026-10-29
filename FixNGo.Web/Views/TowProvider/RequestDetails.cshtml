@@ -1,0 +1,273 @@
+@model object
+@{
+    ViewData["Title"] = "Tow Request Details";
+
+    // دوال ذكية لقراءة كافة خصائص الطلب من الـ ViewModel الممرر من الـ Controller بأمان تام
+    string GetProp(string fallback, params string[] propNames)
+    {
+        if (Model == null) return fallback;
+        var type = Model.GetType();
+        foreach (var name in propNames)
+        {
+            var prop = type.GetProperty(name);
+            if (prop != null)
+            {
+                var val = prop.GetValue(Model);
+                if (val != null && !string.IsNullOrWhiteSpace(val.ToString()))
+                    return val.ToString()!;
+            }
+        }
+        return fallback;
+    }
+
+    bool GetBoolProp(bool fallback, params string[] propNames)
+    {
+        if (Model == null) return fallback;
+        var type = Model.GetType();
+        foreach (var name in propNames)
+        {
+            var prop = type.GetProperty(name);
+            if (prop != null && prop.PropertyType == typeof(bool))
+            {
+                return (bool)(prop.GetValue(Model) ?? fallback);
+            }
+        }
+        return fallback;
+    }
+
+    var requestId = GetProp("1", "Id", "RequestId");
+    var requestCode = GetProp("TOW-9041", "RequestCode", "Code");
+    var customerName = GetProp("Ahmed Mahmoud", "CustomerName", "ClientName");
+    var customerPhone = GetProp("01012345678", "CustomerPhone", "PhoneNumber", "Phone");
+    var vehicleMakeModel = GetProp("Hyundai Elantra", "VehicleMakeModel", "VehicleInfo");
+    var vehicleYear = GetProp("2022", "VehicleYear", "Year");
+    var vehiclePlate = GetProp("أ ب ج - 4512", "VehiclePlate", "PlateNumber");
+    var vehicleColor = GetProp("Metallic Silver (فضي ميتاليك)", "VehicleColor", "Color");
+    var problemType = GetProp("Engine Overheating & Complete Breakdown on Highway", "ProblemType", "IssueDescription");
+    var customerNotes = GetProp("العربية واقفة على يمين الطريق بعد نزلة محور 26 يوليو، محتاج ونش سطحة عشان الفتيس أوتوماتيك ومش بيتحرك.", "CustomerNotes", "AdditionalNotes", "Notes");
+    var towTypeRequired = GetProp("Flatbed Hydraulic Winch (ونش سطحة هيدروليك)", "TowTypeRequired", "TruckType");
+    var pickupAddress = GetProp("26th of July Corridor, Near Mall of Arabia, 6th of October", "PickupAddress", "PickupLocation");
+    var destinationAddress = GetProp("El-Safwa Auto Service Center, Industrial Zone, 6th of October", "DestinationAddress", "DropoffLocation");
+    var distanceToPickupKm = GetProp("3.5", "DistanceToPickupKm", "PickupDistanceKm");
+    var estimatedEtaMinutes = GetProp("10", "EstimatedEtaMinutes", "EtaMinutes");
+    var towingDistanceKm = GetProp("12.4", "TowingDistanceKm", "TotalDistanceKm");
+    var estimatedPrice = GetProp("650", "EstimatedPrice", "TotalCost", "Price");
+    var paymentMethod = GetProp("InstaPay / Cash on Delivery", "PaymentMethod");
+    var isEmergencyP0 = GetBoolProp(true, "IsEmergencyP0", "IsEmergency");
+    var isVehicleMovable = GetBoolProp(false, "IsVehicleMovable", "CanWheelsRoll");
+}
+
+<!-- شريط التنقل المشترك -->
+<partial name="_TowNav" />
+
+<!-- الهيدر العلوي وزرار الرجوع لقائمة الطلبات -->
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div class="d-flex align-items-center gap-3">
+        <a asp-action="Requests" class="btn btn-outline-secondary btn-sm px-3">
+            <i class="bi bi-arrow-left me-1"></i>Back to Requests
+        </a>
+        <div>
+            <div class="d-flex align-items-center gap-2">
+                <h3 class="fw-bold m-0">Dispatch Request #@requestCode</h3>
+                @if (isEmergencyP0)
+                {
+                    <span class="badge bg-danger px-2 py-1">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i>P0 HIGH PRIORITY
+                    </span>
+                }
+            </div>
+            <p class="text-muted small m-0">Full inspection of vehicle condition, pickup coordinates, and payout breakdown before accepting.</p>
+        </div>
+    </div>
+
+    <!-- أزرار القبول أو الرفض السريع في الهيدر -->
+    <div class="d-flex flex-wrap gap-2">
+        <form asp-action="AcceptRequest" asp-route-id="@requestId" method="post">
+            <button type="submit" class="btn btn-warning text-dark fw-bold px-4">
+                <i class="bi bi-check2-circle me-1"></i>Accept & Start Tow
+            </button>
+        </form>
+        <form asp-action="RejectRequest" asp-route-id="@requestId" method="post">
+            <button type="submit" class="btn btn-outline-danger px-3">
+                <i class="bi bi-x-lg me-1"></i>Decline
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- العمود الأيسر: تفاصيل السيارة والعطل والمسار -->
+    <div class="col-lg-8">
+        <!-- 1. كارت حالة السيارة والعطل والملاحظات -->
+        <div class="card border-0 shadow-sm mb-4 @(isEmergencyP0 ? "border-start border-danger border-4" : "")">
+            <div class="card-header bg-transparent py-3 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold m-0">
+                    <i class="bi bi-car-front-fill text-warning me-2"></i>1. Vehicle & Breakdown Diagnostics
+                </h5>
+                <span class="badge @(isVehicleMovable ? "bg-info-subtle text-info" : "bg-danger-subtle text-danger") px-3 py-2">
+                    <i class="bi @(isVehicleMovable ? "bi-check-circle" : "bi-lock-fill") me-1"></i>
+                    @(isVehicleMovable ? "Wheels Roll Freely (قابلة للدحرجة)" : "Locked Wheels / Non-Movable (عجلات مغلقة)")
+                </span>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6 col-md-4">
+                        <div class="p-3 rounded-3 bg-body-tertiary h-100">
+                            <span class="text-muted small d-block">VEHICLE MAKE & MODEL</span>
+                            <strong class="fs-6">@vehicleMakeModel (@vehicleYear)</strong>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-4">
+                        <div class="p-3 rounded-3 bg-body-tertiary h-100">
+                            <span class="text-muted small d-block">LICENSE PLATE (رقم اللوحة)</span>
+                            <strong class="fs-6 text-warning">@vehiclePlate</strong>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-4">
+                        <div class="p-3 rounded-3 bg-body-tertiary h-100">
+                            <span class="text-muted small d-block">VEHICLE COLOR</span>
+                            <strong class="fs-6">@vehicleColor</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded-3 h-100">
+                            <div class="small text-muted fw-bold mb-1">
+                                <i class="bi bi-tools text-danger me-1"></i>REPORTED ISSUE (نوع العطل)
+                            </div>
+                            <div class="fw-semibold text-danger-emphasis">@problemType</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded-3 h-100">
+                            <div class="small text-muted fw-bold mb-1">
+                                <i class="bi bi-truck-flatbed text-warning me-1"></i>REQUIRED TOW EQUIPMENT (نوع الونش المطلوب)
+                            </div>
+                            <div class="fw-semibold">@towTypeRequired</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ملاحظات العميل -->
+                <div class="p-3 rounded-3 bg-warning-subtle text-warning-emphasis border border-warning-subtle small">
+                    <div class="fw-bold mb-1"><i class="bi bi-chat-left-quote-fill me-1"></i>Customer Field Notes (ملاحظات العميل من موقع العطل):</div>
+                    <div>"@customerNotes"</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. كارت تفاصيل مسار الاستلام والتسليم -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent py-3">
+                <h5 class="fw-bold m-0">
+                    <i class="bi bi-signpost-split-fill text-warning me-2"></i>2. Pickup & Drop-off Route Plan
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-3">
+                    <!-- نقطة الاستلام -->
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-3 bg-body-tertiary border-start border-success border-4 h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge bg-success-subtle text-success">STEP A: PICKUP POINT</span>
+                                <small class="text-muted fw-semibold">@distanceToPickupKm km away</small>
+                            </div>
+                            <div class="fw-bold mb-1"><i class="bi bi-geo-alt-fill text-success me-1"></i>@pickupAddress</div>
+                            <small class="text-muted d-block mt-2">
+                                <i class="bi bi-clock me-1"></i>Estimated time to reach customer: <strong>~@estimatedEtaMinutes mins</strong>
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- نقطة التسليم -->
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-3 bg-body-tertiary border-start border-danger border-4 h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge bg-danger-subtle text-danger">STEP B: DESTINATION GARAGE</span>
+                                <small class="text-muted fw-semibold">Tow Dist: @towingDistanceKm km</small>
+                            </div>
+                            <div class="fw-bold mb-1"><i class="bi bi-flag-fill text-danger me-1"></i>@destinationAddress</div>
+                            <small class="text-muted d-block mt-2">
+                                <i class="bi bi-shield-check me-1"></i>Authorized Service Center • Ready for reception
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- العمود الأيمن: بيانات العميل وتفصيل التسعيرة والأرباح -->
+    <div class="col-lg-4">
+        <!-- كارت بيانات صاحب السيارة -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent py-3 fw-bold">
+                <i class="bi bi-person-lines-fill text-warning me-2"></i>Customer Contact Info
+            </div>
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="rounded-circle bg-warning-subtle text-warning d-flex align-items-center justify-content-center fw-bold fs-4" style="width: 55px; height: 55px;">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold m-0">@customerName</h6>
+                        <small class="text-success"><i class="bi bi-patch-check-fill me-1"></i>Verified FixNGo User</small>
+                    </div>
+                </div>
+                <div class="p-3 rounded-3 bg-body-tertiary small mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted">Phone Number:</span>
+                        <strong>@customerPhone</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">GPS Location Shared:</span>
+                        <span class="text-success fw-semibold">Active & Accurate</span>
+                    </div>
+                </div>
+                <a href="tel:@customerPhone" class="btn btn-outline-success w-100 fw-semibold">
+                    <i class="bi bi-telephone-fill me-2"></i>Call Customer Directly
+                </a>
+            </div>
+        </div>
+
+        <!-- كارت تفاصيل الحساب المالي والأرباح -->
+        <div class="card border-0 shadow-sm border-top border-warning border-4">
+            <div class="card-header bg-transparent py-3 fw-bold">
+                <i class="bi bi-cash-coin text-warning me-2"></i>Estimated Payout Breakdown
+            </div>
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-2 small">
+                    <span class="text-muted">Base Winch Opening Fare:</span>
+                    <span class="fw-semibold">250 EGP</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-2 small">
+                    <span class="text-muted">Distance Tariff (@towingDistanceKm km):</span>
+                    <span class="fw-semibold">350 EGP</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-3 small">
+                    <span class="text-muted">Priority / Hydraulic Surcharge:</span>
+                    <span class="fw-semibold">50 EGP</span>
+                </div>
+
+                <hr class="text-muted" />
+
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="fw-bold">Net Provider Payout:</span>
+                    <span class="display-6 fw-bold text-success">@estimatedPrice <small class="fs-6">EGP</small></span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center small mb-4">
+                    <span class="text-muted">Payment Method:</span>
+                    <span class="badge bg-primary-subtle text-primary">@paymentMethod</span>
+                </div>
+
+                <form asp-action="AcceptRequest" asp-route-id="@requestId" method="post" class="d-grid gap-2">
+                    <button type="submit" class="btn btn-warning text-dark fw-bold py-2">
+                        <i class="bi bi-check2-circle me-1"></i>Accept Dispatch Now
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

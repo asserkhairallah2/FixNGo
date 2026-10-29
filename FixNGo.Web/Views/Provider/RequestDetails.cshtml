@@ -1,0 +1,251 @@
+@model ProviderRequestDetailsDto
+@{
+    ViewData["Title"] = $"Request Details #{Model.Id} - FixNGo";
+}
+
+<!-- Flash Alerts -->
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="mb-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1 small">
+            <li class="breadcrumb-item"><a asp-action="Dashboard" class="text-secondary text-decoration-none">Dashboard</a></li>
+            <li class="breadcrumb-item"><a asp-action="Requests" class="text-secondary text-decoration-none">Requests</a></li>
+            <li class="breadcrumb-item active text-body" aria-current="page">Ticket #@Model.Id</li>
+        </ol>
+    </nav>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+        <div>
+            <h2 class="fw-bold mb-1">
+                @Model.ServiceType Assistance Request
+                @if (Model.IsP0Emergency)
+                {
+                    <span class="badge bg-danger text-white fs-6 ms-2">P0 EMERGENCY</span>
+                }
+            </h2>
+            <p class="text-secondary mb-0">Ticket #@Model.Id • Submitted @Model.CreatedAt.ToLocalTime().ToString("g")</p>
+        </div>
+        <div>
+            <span class="badge bg-warning-subtle text-warning border border-warning-subtle fs-6 px-3 py-2">
+                Status: @Model.Status
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Main Details Column -->
+    <div class="col-lg-8">
+        <!-- Breakdown Problem Card -->
+        <div class="card border bg-body-tertiary rounded-4 shadow-sm p-4 mb-4">
+            <h5 class="fw-bold mb-3"><i class="bi bi-tools text-warning me-2"></i>Reported Breakdown Problem</h5>
+            <div class="p-3 rounded-3 bg-dark bg-opacity-25 border mb-3">
+                <p class="fs-5 mb-0 fw-semibold text-light">@Model.ProblemDescription</p>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="p-3 rounded-3 border bg-dark bg-opacity-10">
+                        <small class="text-secondary d-block mb-1">SERVICE TYPE</small>
+                        <span class="fw-bold fs-6">@Model.ServiceType</span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="p-3 rounded-3 border bg-dark bg-opacity-10">
+                        <small class="text-secondary d-block mb-1">ESTIMATED FARE</small>
+                        <span class="fw-bold fs-6 text-warning">@Model.EstimatedFare.ToString("N0") EGP</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Breakdown Location Card -->
+        <div class="card border bg-body-tertiary rounded-4 shadow-sm p-4 mb-4">
+            <h5 class="fw-bold mb-3"><i class="bi bi-geo-alt-fill text-danger me-2"></i>Breakdown Location & Coordinates</h5>
+            <p class="text-secondary mb-2">
+                <i class="bi bi-pin-map-fill text-danger me-1"></i>
+                <strong>Address / Highway Marker:</strong> @Model.CustomerAddress
+            </p>
+            <p class="text-secondary small mb-3">
+                Coordinates: <code>@Model.CustomerLatitude.ToString("F4"), @Model.CustomerLongitude.ToString("F4")</code>
+            </p>
+
+            <!-- Map Coordinates Link -->
+            <a href="https://maps.google.com/?q=@Model.CustomerLatitude,@Model.CustomerLongitude" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-box-arrow-up-right me-1"></i> Open In Google Maps Navigation
+            </a>
+        </div>
+
+        <!-- Customer Rating / Review if Completed -->
+        @if (Model.Rating.HasValue)
+        {
+            <div class="card border border-warning bg-body-tertiary rounded-4 shadow-sm p-4 mb-4">
+                <h5 class="fw-bold mb-2"><i class="bi bi-star-fill text-warning me-2"></i>Customer Rating & Feedback</h5>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        <i class="bi bi-star-fill @(i <= Model.Rating.Value ? "text-warning" : "text-secondary") fs-5"></i>
+                    }
+                    <span class="fw-bold fs-5 ms-2">@Model.Rating.Value / 5</span>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.ReviewText))
+                {
+                    <blockquote class="blockquote small text-secondary mb-0">
+                        "@Model.ReviewText"
+                    </blockquote>
+                }
+            </div>
+        }
+    </div>
+
+    <!-- Sidebar: Customer & Action Column -->
+    <div class="col-lg-4">
+        <!-- Customer & Vehicle Card -->
+        <div class="card border bg-body-tertiary rounded-4 shadow-sm p-4 mb-4">
+            <h5 class="fw-bold mb-3"><i class="bi bi-person-circle text-primary me-2"></i>Driver & Vehicle</h5>
+            <div class="mb-3">
+                <small class="text-secondary d-block">DRIVER NAME</small>
+                <span class="fw-bold fs-6">@Model.CustomerName</span>
+            </div>
+            <div class="mb-3">
+                <small class="text-secondary d-block">CONTACT PHONE</small>
+                <div class="d-flex align-items-center justify-content-between mt-1">
+                    <span class="fw-bold fs-6">@Model.CustomerPhone</span>
+                    @if (Model.CanManage)
+                    {
+                        <a href="tel:@Model.CustomerPhone" class="btn btn-outline-success btn-sm">
+                            <i class="bi bi-telephone-fill me-1"></i> Call
+                        </a>
+                    }
+                </div>
+            </div>
+            <div class="mb-3">
+                <small class="text-secondary d-block">VEHICLE INFO</small>
+                <span class="fw-bold">@(string.IsNullOrEmpty(Model.VehicleInfo) ? "Not Specified" : Model.VehicleInfo)</span>
+            </div>
+            @if (!string.IsNullOrEmpty(Model.VehiclePlateNumber))
+            {
+                <div class="mb-0">
+                    <small class="text-secondary d-block">LICENSE PLATE</small>
+                    <span class="badge bg-secondary-subtle text-body border px-2 py-1 fs-6">@Model.VehiclePlateNumber</span>
+                </div>
+            }
+        </div>
+
+        <!-- Available Actions Card -->
+        <div class="card border bg-body-tertiary rounded-4 shadow-sm p-4">
+            <h5 class="fw-bold mb-3"><i class="bi bi-gear-fill text-warning me-2"></i>Available Actions</h5>
+
+            @if (Model.CanAccept)
+            {
+                <form asp-action="AcceptRequest" asp-route-id="@Model.Id" method="post" class="mb-2">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-emergency w-100 py-2 fw-bold">
+                        <i class="bi bi-check2-circle me-1"></i> Accept Request
+                    </button>
+                </form>
+                <form asp-action="RejectRequest" asp-route-id="@Model.Id" method="post" class="m-0" onsubmit="return confirm('Decline this assistance offer?');">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-outline-danger w-100 py-2">
+                        Decline Offer
+                    </button>
+                </form>
+            }
+            else if (Model.CanManage)
+            {
+                <a asp-action="ActiveRequest" class="btn btn-warning w-100 py-2 fw-bold mb-2">
+                    <i class="bi bi-compass me-1"></i> Open Active Mission Tracker
+                </a>
+
+                @if (Model.Status == AssistanceRequestStatus.Accepted)
+                {
+                    <form asp-action="UpdateStatus" method="post" class="m-0">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <input type="hidden" name="newStatus" value="@AssistanceRequestStatus.EnRoute" />
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+                            <i class="bi bi-truck me-1"></i> Depart Toward Customer (En Route)
+                        </button>
+                    </form>
+                }
+                else if (Model.Status == AssistanceRequestStatus.EnRoute)
+                {
+                    <form asp-action="UpdateStatus" method="post" class="m-0">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <input type="hidden" name="newStatus" value="@AssistanceRequestStatus.Arrived" />
+                        <button type="submit" class="btn btn-info w-100 py-2 fw-semibold">
+                            <i class="bi bi-geo-alt-fill me-1"></i> Mark Arrived At Vehicle
+                        </button>
+                    </form>
+                }
+                else if (Model.Status == AssistanceRequestStatus.Arrived)
+                {
+                    <form asp-action="UpdateStatus" method="post" class="m-0">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <input type="hidden" name="newStatus" value="@AssistanceRequestStatus.InService" />
+                        <button type="submit" class="btn btn-warning w-100 py-2 fw-semibold">
+                            <i class="bi bi-wrench-adjustable me-1"></i> Start Service Repair
+                        </button>
+                    </form>
+                }
+                else if (Model.Status == AssistanceRequestStatus.InService)
+                {
+                    <button type="button" class="btn btn-success w-100 py-2 fw-bold" data-bs-toggle="modal" data-bs-target="#completeModal">
+                        <i class="bi bi-check-circle-fill me-1"></i> Complete Service
+                    </button>
+                }
+            }
+            else
+            {
+                <div class="text-secondary small text-center">
+                    This ticket has reached status <strong>@Model.Status</strong>. No further status changes are required.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Completing Service -->
+<div class="modal fade" id="completeModal" tabindex="-1" aria-labelledby="completeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="completeModalLabel"><i class="bi bi-check-circle-fill text-success me-2"></i>Complete Service Work</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="CompleteService" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.Id" />
+                <div class="modal-body">
+                    <p class="text-secondary small">
+                        Confirm that the roadside assistance or towing service has been safely and successfully delivered to the customer.
+                    </p>
+                    <div class="mb-3">
+                        <label for="finalFare" class="form-label fw-semibold">Final Agreed Service Fare (EGP)</label>
+                        <input type="number" step="1" name="finalFare" id="finalFare" class="form-control" value="@(Model.FinalFare ?? Model.EstimatedFare)" required />
+                        <div class="form-text small">Estimated base fare was: @Model.EstimatedFare.ToString("N0") EGP</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success fw-bold">Confirm & Mark Completed</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

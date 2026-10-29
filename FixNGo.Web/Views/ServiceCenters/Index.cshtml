@@ -1,0 +1,80 @@
+@model IReadOnlyList<FixNGo.Domain.Entities.ServiceCenter>
+@{
+    ViewData["Title"] = "Certified Service Centers";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1">Service Centers Directory</h2>
+        <p class="text-muted mb-0">Browse certified garages, explore repair catalogs, and book appointments.</p>
+    </div>
+</div>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info shadow-sm p-4 rounded-3 border-0">
+        <div class="d-flex align-items-center">
+            <i class="bi bi-info-circle-fill fs-3 me-3 text-info"></i>
+            <div>
+                <h5 class="alert-heading fw-bold mb-1">No Service Centers registered yet</h5>
+                <p class="mb-0">New garages and repair centers will appear here once verified by platform administrators.</p>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        @foreach (var center in Model)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0 rounded-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title fw-bold text-dark mb-0">@center.Name</h5>
+                            @if (center.VerificationStatus == FixNGo.Domain.Enums.VerificationStatus.Verified)
+                            {
+                                <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                    <i class="bi bi-patch-check-fill me-1"></i>Verified
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle">
+                                    @center.VerificationStatus
+                                </span>
+                            }
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(center.NameEn))
+                        {
+                            <h6 class="text-muted small mb-3">@center.NameEn</h6>
+                        }
+
+                        <p class="card-text text-secondary mb-2">
+                            <i class="bi bi-geo-alt text-danger me-1"></i>@center.Address
+                        </p>
+                        <p class="card-text text-secondary mb-3">
+                            <i class="bi bi-telephone text-primary me-1"></i>@center.Phone
+                        </p>
+
+                        <div class="d-flex justify-content-between align-items-center py-2 border-top border-bottom mb-3 text-muted small">
+                            <span>
+                                <i class="bi bi-star-fill text-warning me-1"></i>
+                                <strong>@center.Rating.ToString("F1")</strong> (@center.TotalReviews reviews)
+                            </span>
+                            <span>
+                                <i class="bi bi-tools text-secondary me-1"></i>@center.Services.Count services
+                            </span>
+                        </div>
+
+                        <a asp-controller="ServiceCenters" asp-action="Details" asp-route-id="@center.Id" class="btn btn-outline-primary w-100">
+                            View Services & Hours
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+

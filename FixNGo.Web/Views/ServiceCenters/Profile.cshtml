@@ -1,0 +1,184 @@
+@model FixNGo.Web.Models.CenterProfileViewModel
+@{
+    ViewData["Title"] = "Service Center Profile";
+}
+
+<div class="container py-3">
+    <!-- Breadcrumb and Back Navigation -->
+    <div class="mb-3">
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm rounded-2">
+            <i class="bi bi-arrow-left me-1"></i>Back to Centers
+        </a>
+    </div>
+
+    <!-- Success Message Notification -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 mb-4 rounded-3" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-check-circle-fill fs-4 me-2 text-success"></i>
+                <div>
+                    <strong>Success!</strong> @TempData["Success"]
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Header Summary Card -->
+    <div class="card shadow-sm border-0 rounded-3 mb-4">
+        <div class="card-body p-4">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="p-3 bg-primary-subtle text-primary rounded-circle fs-3 d-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                        <i class="bi bi-buildings"></i>
+                    </div>
+                    <div>
+                        <h2 class="fw-bold mb-1 text-body">@Model.Name</h2>
+                        <div class="text-muted small">
+                            <i class="bi bi-geo-alt me-1"></i>@Model.Address
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    @if (Model.IsActive)
+                    {
+                        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fs-6 rounded-pill">
+                            <i class="bi bi-check-circle-fill me-1"></i>Active
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 fs-6 rounded-pill">
+                            <i class="bi bi-pause-circle-fill me-1"></i>Inactive
+                        </span>
+                    }
+
+                    @if (Model.IsVerified)
+                    {
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fs-6 rounded-pill">
+                            <i class="bi bi-patch-check-fill me-1"></i>Verified Center
+                        </span>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Edit Form -->
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-body border-bottom py-3">
+            <h5 class="fw-bold mb-0 text-body">
+                <i class="bi bi-pencil-square text-primary me-2"></i>Edit Profile Details
+            </h5>
+        </div>
+        <div class="card-body p-4">
+            <form asp-action="Profile" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="IsVerified" />
+
+                <!-- Center Name -->
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label fw-semibold text-body">Center Name</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-body-tertiary border-secondary-subtle">
+                            <i class="bi bi-building"></i>
+                        </span>
+                        <input asp-for="Name" class="form-control" placeholder="Enter center name" required />
+                    </div>
+                </div>
+
+                <!-- Contact Info: Phone & Email -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="Phone" class="form-label fw-semibold text-body">Phone Number</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-body-tertiary border-secondary-subtle">
+                                <i class="bi bi-telephone"></i>
+                            </span>
+                            <input asp-for="Phone" class="form-control" placeholder="e.g. +20 100 123 4567" required />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Email" class="form-label fw-semibold text-body">Email Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-body-tertiary border-secondary-subtle">
+                                <i class="bi bi-envelope"></i>
+                            </span>
+                            <input asp-for="Email" type="email" class="form-control" placeholder="e.g. contact@domain.com" required />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Address -->
+                <div class="mb-4">
+                    <label asp-for="Address" class="form-label fw-semibold text-body">Address</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-body-tertiary border-secondary-subtle">
+                            <i class="bi bi-geo-alt"></i>
+                        </span>
+                        <input asp-for="Address" class="form-control" placeholder="Enter street and city address" required />
+                    </div>
+                </div>
+
+                <!-- Location Coordinates & Static Map Preview -->
+                <div class="card bg-body-tertiary border-0 rounded-3 mb-4 p-3">
+                    <h6 class="fw-bold mb-3 text-body">
+                        <i class="bi bi-pin-map text-primary me-2"></i>Location Coordinates & Map
+                    </h6>
+                    <div class="row g-3 align-items-center">
+                        <div class="col-lg-6">
+                            <!-- Latitude Input -->
+                            <div class="mb-3">
+                                <label asp-for="Latitude" class="form-label fw-semibold text-body">Latitude</label>
+                                <input asp-for="Latitude" type="number" step="any" class="form-control" placeholder="e.g. 30.0561" required />
+                            </div>
+
+                            <!-- Longitude Input -->
+                            <div class="mb-3">
+                                <label asp-for="Longitude" class="form-label fw-semibold text-body">Longitude</label>
+                                <input asp-for="Longitude" type="number" step="any" class="form-control" placeholder="e.g. 31.3300" required />
+                            </div>
+
+                            <!-- Account Active Switch -->
+                            <div class="form-check form-switch pt-2">
+                                <input asp-for="IsActive" class="form-check-input" type="checkbox" role="switch" id="isActiveSwitch">
+                                <label class="form-check-label fw-semibold text-body" for="isActiveSwitch">
+                                    Account Active
+                                </label>
+                                <div class="text-muted small">
+                                    When disabled, customers will not see your center in search listings.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Static Map Placeholder Box -->
+                        <div class="col-lg-6">
+                            <div class="border rounded-3 p-4 text-center d-flex flex-column align-items-center justify-content-center bg-body" style="min-height: 200px; border-style: dashed !important;">
+                                <div class="p-3 bg-danger-subtle text-danger rounded-circle mb-2 fs-2 d-flex align-items-center justify-content-center" style="width: 56px; height: 56px;">
+                                    <i class="bi bi-geo-alt-fill"></i>
+                                </div>
+                                <h6 class="fw-bold text-body mb-1">Static Map Location</h6>
+                                <p class="text-muted small mb-2">
+                                    Lat: <span class="fw-semibold">@Model.Latitude</span>, Long: <span class="fw-semibold">@Model.Longitude</span>
+                                </p>
+                                <span class="badge bg-secondary-subtle text-secondary small">
+                                    <i class="bi bi-map me-1"></i>Map Preview Placeholder
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Action Buttons -->
+                <div class="d-flex justify-content-end gap-2">
+                    <a asp-action="Index" class="btn btn-outline-secondary rounded-2">Cancel</a>
+                    <button type="submit" class="btn btn-primary rounded-2 shadow-sm px-4">
+                        <i class="bi bi-check2-circle me-1"></i>Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

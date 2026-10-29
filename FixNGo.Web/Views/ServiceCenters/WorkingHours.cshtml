@@ -1,0 +1,52 @@
+@model IEnumerable<FixNGo.Domain.Entities.WorkingHours>
+
+@{
+    ViewData["Title"] = "Manage Working Hours";
+    var centerId = ViewContext.RouteData.Values["id"] ?? Context.Request.Query["id"];
+}
+
+<div class="container mt-4">
+    <h2>Manage Working Hours</h2>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    <form asp-action="WorkingHours" asp-route-id="@centerId" method="post">
+        @Html.AntiForgeryToken()
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Day</th>
+                    <th>Opening Time</th>
+                    <th>Closing Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var hoursList = Model.ToList();
+                }
+                @for (int i = 0; i < hoursList.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            <input type="hidden" asp-for="@hoursList[i].WorkingHourId" />
+                            <input type="hidden" asp-for="@hoursList[i].ServiceCenterId" />
+                            <input type="hidden" asp-for="@hoursList[i].DayOfWeek" />
+                            @hoursList[i].DayOfWeek
+                        </td>
+                        <td>
+                            <input type="time" asp-for="@hoursList[i].OpenTime" class="form-control" />
+                        </td>
+                        <td>
+                            <input type="time" asp-for="@hoursList[i].CloseTime" class="form-control" />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a asp-action="Details" asp-route-id="@centerId" class="btn btn-secondary">Back to Details</a>
+    </form>
+</div>

@@ -1,0 +1,75 @@
+@{
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "Dashboard";
+}
+
+<div class="card border-0 shadow-sm mb-4 bg-body-tertiary">
+    <div class="card-body p-2">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <div class="d-flex align-items-center gap-2 px-2">
+                <span class="badge rounded-pill" style="background-color: #fd7e14;">
+                    <i class="bi bi-truck-flatbed me-1"></i> Tow Truck Portal
+                </span>
+                <small class="text-muted d-none d-md-inline">Provider Workspace</small>
+            </div>
+            <ul class="nav nav-pills flex-wrap gap-1">
+                <li class="nav-item">
+                    <a class="nav-link btn-sm py-1 px-3 @(currentAction == "Dashboard" ? "active bg-warning text-dark fw-bold" : "text-body")"
+                       asp-controller="TowProvider" asp-action="Dashboard">
+                        <i class="bi bi-speedometer2 me-1"></i>1. Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn-sm py-1 px-3 @(currentAction == "Requests" || currentAction == "RequestDetails" ? "active bg-warning text-dark fw-bold" : "text-body")"
+                       asp-controller="TowProvider" asp-action="Requests">
+                        <i class="bi bi-bell-fill me-1"></i>2. Tow Requests
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn-sm py-1 px-3 @(currentAction == "ActiveTow" ? "active bg-warning text-dark fw-bold" : "text-body")"
+                       asp-controller="TowProvider" asp-action="ActiveTow">
+                        <i class="bi bi-gear-wide-connected me-1"></i>4. Active Tow
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn-sm py-1 px-3 @(currentAction == "Navigation" ? "active bg-warning text-dark fw-bold" : "text-body")"
+                       asp-controller="TowProvider" asp-action="Navigation">
+                        <i class="bi bi-geo-alt-fill me-1"></i>5. Navigation Map
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn-sm py-1 px-3 @(currentAction == "Earnings" ? "active bg-warning text-dark fw-bold" : "text-body")"
+                       asp-controller="TowProvider" asp-action="Earnings">
+                        <i class="bi bi-wallet2 me-1"></i>6. Earnings
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn-sm py-1 px-3 @(currentAction == "History" ? "active bg-warning text-dark fw-bold" : "text-body")"
+                       asp-controller="TowProvider" asp-action="History">
+                        <i class="bi bi-clock-history me-1"></i>7. Tow History
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn-sm py-1 px-3 @(currentAction == "Profile" ? "active bg-warning text-dark fw-bold" : "text-body")"
+                       asp-controller="TowProvider" asp-action="Profile">
+                        <i class="bi bi-person-badge me-1"></i>8. Tow Profile
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["Warning"] != null)
+{
+    <div class="alert alert-warning alert-dismissible fade show shadow-sm" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Warning"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}

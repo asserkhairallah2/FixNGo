@@ -1,0 +1,196 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - FixNGo</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            /* ????? ????? ?? ???? ????? ?????? ???????? ?????? ???? ??????? ?? ????? ???? */
+            padding-top: 76px;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .btn-emergency {
+            background-color: #fd7e14;
+            border-color: #fd7e14;
+            color: #ffffff;
+        }
+
+            .btn-emergency:hover {
+                background-color: #e86b03;
+                border-color: #e86b03;
+                color: #ffffff;
+            }
+
+        .btn-outline-emergency {
+            border-color: #fd7e14;
+            color: #fd7e14;
+        }
+
+            .btn-outline-emergency:hover {
+                background-color: #fd7e14;
+                border-color: #fd7e14;
+                color: #ffffff;
+            }
+
+        .main-content {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <!-- ??? ????? fixed-top ??? ???? ???? ???? ??? -->
+        <nav class="navbar navbar-expand-lg shadow-sm fixed-top bg-body">
+            <div class="container">
+                <!-- ?? ?????? ????? (??????? ????????) ??????? -->
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn btn-outline-secondary btn-sm rounded-2 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" title="Menu">
+                        <i class="bi bi-list fs-5"></i>
+                    </button>
+                    <a class="navbar-brand m-0" asp-controller="Home" asp-action="Index">
+                        <i class="bi bi-wrench-adjustable-circle me-1" style="color: #fd7e14;"></i><span>Fix</span><span style="color: #fd7e14;">N</span><span>Go</span>
+                    </a>
+                </div>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarMain">
+                    <!-- ??????? ????????: ???? ??????????? ????? ???????? ????? -->
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="bi bi-person-gear me-1"></i>Mechanic
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="ServiceCenters" asp-action="Index">
+                                <i class="bi bi-buildings me-1"></i>Service Centers
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="ServiceCenters" asp-action="Dashboard">
+                                <i class="bi bi-speedometer2 me-1"></i>Center Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="bi bi-truck-flatbed me-1"></i>Wench / Towing
+                            </a>
+                        </li>
+                    </ul>
+
+                    <ul class="navbar-nav ms-auto align-items-center gap-2">
+                        <li class="nav-item">
+                            <a class="btn btn-outline-emergency btn-sm" href="#">
+                                <i class="bi bi-exclamation-triangle-fill me-1"></i>Emergency Help
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-outline-secondary btn-sm" href="/Account/Login">Sign In</a>
+                        </li>
+                        <li class="nav-item">
+                            <!-- ???? ????? ?????? (???/???) -->
+                            <button class="btn btn-outline-secondary btn-sm rounded-2 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;" id="themeToggle" type="button" title="Toggle Theme">
+                                <i class="bi bi-sun-fill" id="themeIcon"></i>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Offcanvas Sidebar (??????? ???????? ??? 3 ?????) -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+        <div class="offcanvas-header border-bottom">
+            <h5 class="offcanvas-title fw-bold" id="sidebarMenuLabel">
+                <i class="bi bi-grid-fill me-2 text-warning"></i>FixNGo Menu
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="list-group list-group-flush gap-2">
+                <a asp-controller="Home" asp-action="Index" class="list-group-item list-group-item-action rounded-3 border-0 py-2">
+                    <i class="bi bi-house-door me-2 text-primary"></i> Home Dashboard
+                </a>
+                <a href="#" class="list-group-item list-group-item-action rounded-3 border-0 py-2">
+                    <i class="bi bi-person-gear me-2 text-warning"></i> Mobile Mechanic
+                </a>
+                <a asp-controller="ServiceCenters" asp-action="Index" class="list-group-item list-group-item-action rounded-3 border-0 py-2">
+                    <i class="bi bi-buildings me-2 text-success"></i> Service Centers
+                </a>
+                <a href="#" class="list-group-item list-group-item-action rounded-3 border-0 py-2">
+                    <i class="bi bi-truck-flatbed me-2 text-info"></i> Towing / Wench
+                </a>
+                <hr class="text-muted">
+                <a href="#" class="list-group-item list-group-item-action rounded-3 border-0 py-2">
+                    <i class="bi bi-telephone-fill me-2 text-danger"></i> Emergency Hotlines
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <main role="main" class="main-content py-4">
+        <div class="container">
+            @RenderBody()
+        </div>
+    </main>
+
+    <footer class="py-3 text-center border-top">
+        <div class="container">
+            <small>&copy; 2026 <span style="color: #6c757d;">Fix</span><span style="color: #fd7e14;">N</span><span style="color: #6c757d;">Go</span> - Integrated Roadside Assistance & Vehicle Care Platform. All rights reserved.</small>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Dark Mode Script -->
+    <script>
+        const html = document.documentElement;
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        html.setAttribute('data-bs-theme', savedTheme);
+        updateToggle(savedTheme);
+
+        themeToggle.addEventListener('click', function () {
+            const currentTheme = html.getAttribute('data-bs-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+            html.setAttribute('data-bs-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateToggle(newTheme);
+        });
+
+        function updateToggle(theme) {
+            if (theme === 'dark') {
+                themeIcon.className = 'bi bi-sun-fill';
+            } else {
+                themeIcon.className = 'bi bi-moon-fill';
+            }
+        }
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

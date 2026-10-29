@@ -1,0 +1,168 @@
+﻿@{
+    ViewData["Title"] = "Emergency Roadside Assistance - FixNGo";
+}
+
+<div class="container-fluid px-0">
+
+    <!-- Top Alert Banner -->
+    <div class="alert alert-dark border-0 rounded-3 mb-4 p-3 bg-body-tertiary d-flex justify-content-between align-items-center">
+        <div>
+            <span class="badge bg-danger me-2">EMERGENCY ROADSIDE ASSISTANCE</span>
+            <span class="fw-bold fs-5">Help is Ready On Your Route</span>
+            <p class="text-body-secondary mb-0 small">Tap SOS or choose your issue below for immediate dispatch to your exact position.</p>
+        </div>
+        <div class="d-none d-md-flex align-items-center text-body-secondary small border p-2 rounded-2">
+            <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+            <span>CURRENT LOCATION: <strong>Cairo-Alexandria Desert Road, Km 28</strong></span>
+        </div>
+    </div>
+
+    <!-- Main Section (Instant Rescue / SOS) -->
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border bg-body-tertiary p-4 rounded-4">
+                <div class="card-body p-0">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">EMERGENCY PRIORITY</span>
+                        <span class="text-success small fw-semibold"><i class="bi bi-circle-fill me-1" style="font-size: 8px;"></i>Patrols in Range</span>
+                    </div>
+
+                    <h2 class="fw-bold mb-2">Need Instant Rescue?</h2>
+                    <p class="text-body-secondary mb-4">
+                        Press once to transmit your exact location to the nearest desert highway patrol. Units arrive in an estimated 8-12 minutes.
+                    </p>
+
+                    <button type="button" class="btn btn-emergency btn-lg w-100 py-3 fw-bold fs-5 shadow d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-exclamation-triangle-fill"></i> REQUEST EMERGENCY ASSISTANCE <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Static Map Section -->
+    <div class="card shadow-sm border bg-body-tertiary mb-4 rounded-4 overflow-hidden">
+        <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="fw-bold mb-1"><i class="bi bi-map text-warning me-2"></i>Live Highway Map & Nearest Patrol Units</h5>
+                <p class="text-body-secondary small mb-0">Real-time GPS tracking on Cairo-Alexandria Desert Road Km 28 • 3 Highway Patrols within 4 km</p>
+            </div>
+            <div class="d-none d-md-flex gap-2">
+                <span class="badge bg-secondary-subtle text-body border px-3 py-2">Traffic Flow: Normal (95 km/h)</span>
+                <button class="btn btn-sm btn-outline-warning fw-semibold">Recenter on My Vehicle</button>
+            </div>
+        </div>
+        <div class="card-body p-4">
+            <!-- Static Map Simulation Box -->
+            <div class="position-relative rounded-3 overflow-hidden bg-dark border border-secondary" style="height: 320px; background: linear-gradient(135deg, #111827 0%, #1f2937 100%);">
+                <!-- Grid Lines Simulation -->
+                <div class="position-absolute w-100 h-100 opacity-25" style="background-image: radial-gradient(#4b5563 1px, transparent 1px); background-size: 24px 24px;"></div>
+
+                <!-- Road Curve Line -->
+                <svg class="position-absolute w-100 h-100" preserveAspectRatio="none" viewBox="0 0 1000 300">
+                    <path d="M 0,250 Q 300,50 1000,100" fill="none" stroke="#374151" stroke-width="24" stroke-linecap="round" />
+                    <path d="M 0,250 Q 300,50 1000,100" fill="none" stroke="#fbbf24" stroke-width="4" stroke-dasharray="12,12" />
+                </svg>
+
+                <!-- Markers on Map -->
+                <div class="position-absolute" style="top: 45%; left: 30%;">
+                    <div class="badge bg-success text-dark fw-bold px-2 py-1 shadow d-flex align-items-center gap-1 border border-light">
+                        <i class="bi bi-shield-check"></i> Patrol #02 <span class="text-muted small fw-normal">(1.4 km away)</span>
+                    </div>
+                </div>
+
+                <div class="position-absolute translate-middle" style="top: 55%; left: 52%;">
+                    <div class="badge bg-danger text-white fw-bold px-3 py-2 shadow-lg d-flex align-items-center gap-2 border border-light">
+                        <i class="bi bi-car-front-fill fs-5"></i>
+                        <div>
+                            <div>My Vehicle (Toyota)</div>
+                            <small class="fw-normal text-white-50">Km 28 • SOS Ready</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="position-absolute" style="top: 25%; left: 68%;">
+                    <div class="badge bg-warning text-dark fw-bold px-2 py-1 shadow d-flex align-items-center gap-1">
+                        <i class="bi bi-tools"></i> FixNGo #04 <span class="small">(2.8 km away)</span>
+                    </div>
+                </div>
+
+                <!-- Map Controls Overlay -->
+                <div class="position-absolute bottom-0 start-0 p-3">
+                    <span class="badge bg-dark bg-opacity-75 text-light border border-secondary"><i class="bi bi-exclamation-triangle text-warning me-1"></i> Cairo-Alexandria Desert Hwy (Route 75M)</span>
+                </div>
+                <div class="position-absolute top-0 end-0 p-3 d-flex flex-column gap-1">
+                    <button class="btn btn-sm btn-dark border border-secondary text-light fw-bold">+</button>
+                    <button class="btn btn-sm btn-dark border border-secondary text-light fw-bold">-</button>
+                    <button class="btn btn-sm btn-dark border border-secondary text-light"><i class="bi bi-compass"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Row: Hotlines & Safety Checklist -->
+    <div class="row g-4">
+
+        <!-- Direct Emergency Hotlines -->
+        <div class="col-lg-6">
+            <div class="card h-100 shadow-sm border bg-body-tertiary p-4 rounded-4">
+                <h5 class="fw-bold mb-3"><i class="bi bi-telephone-fill text-danger me-2"></i>Direct Emergency Hotlines</h5>
+                <div class="d-flex flex-column gap-3">
+                    <div class="p-3 rounded-3 border bg-dark bg-opacity-25 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="fw-bold mb-0">126</h6>
+                            <small class="text-body-secondary">Highway Police (المرور السريع)</small>
+                        </div>
+                        <a href="tel:126" class="btn btn-sm btn-outline-danger"><i class="bi bi-telephone-fill"></i></a>
+                    </div>
+                    <div class="p-3 rounded-3 border bg-dark bg-opacity-25 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="fw-bold mb-0">123</h6>
+                            <small class="text-body-secondary">National Ambulance (الإسعاف)</small>
+                        </div>
+                        <a href="tel:123" class="btn btn-sm btn-outline-danger"><i class="bi bi-telephone-fill"></i></a>
+                    </div>
+                    <div class="p-3 rounded-3 border bg-dark bg-opacity-25 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="fw-bold mb-0">19999</h6>
+                            <small class="text-body-secondary">FixNGo Command Hotline</small>
+                        </div>
+                        <a href="tel:19999" class="btn btn-sm btn-outline-emergency"><i class="bi bi-telephone-fill"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Emergency Safety Checklist -->
+        <div class="col-lg-6">
+            <div class="card h-100 shadow-sm border bg-body-tertiary p-4 rounded-4">
+                <h5 class="fw-bold mb-3"><i class="bi bi-shield-check text-success me-2"></i>Emergency Safety Checklist</h5>
+                <div class="d-flex flex-column gap-3">
+                    <div class="p-3 rounded-3 border bg-dark bg-opacity-25 d-flex gap-3 align-items-start">
+                        <span class="badge bg-warning text-dark rounded-circle p-2 fw-bold">1</span>
+                        <div>
+                            <h6 class="fw-bold mb-1">Hazard Flashers On</h6>
+                            <p class="text-body-secondary small mb-0">Turn on your hazard lights immediately to warn approaching vehicles.</p>
+                        </div>
+                    </div>
+                    <div class="p-3 rounded-3 border bg-dark bg-opacity-25 d-flex gap-3 align-items-start">
+                        <span class="badge bg-warning text-dark rounded-circle p-2 fw-bold">2</span>
+                        <div>
+                            <h6 class="fw-bold mb-1">Exit & Step Behind Guardrail</h6>
+                            <p class="text-body-secondary small mb-0">Exit from the right side and wait safely on the shoulder behind metal barriers.</p>
+                        </div>
+                    </div>
+                    <div class="p-3 rounded-3 border bg-dark bg-opacity-25 d-flex gap-3 align-items-start">
+                        <span class="badge bg-warning text-dark rounded-circle p-2 fw-bold">3</span>
+                        <div>
+                            <h6 class="fw-bold mb-1">Stay Visible & Calm</h6>
+                            <p class="text-body-secondary small mb-0">Keep your phone charged and do not walk onto the active highway lanes.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>

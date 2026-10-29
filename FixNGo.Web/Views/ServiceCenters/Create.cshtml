@@ -1,0 +1,105 @@
+﻿@model FixNGo.Domain.Entities.Booking
+
+@{
+    ViewData["Title"] = "Book Appointment";
+}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="bi bi-calendar-plus me-2"></i>Book an Appointment
+                    </h4>
+                    @if (ViewBag.ServiceCenterName != null)
+                    {
+                        <small class="text-white-50">at @ViewBag.ServiceCenterName</small>
+                    }
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <!-- Hidden Service Center ID -->
+                        <input type="hidden" asp-for="ServiceCenterId" />
+
+                        <!-- Select Service -->
+                        <div class="mb-3">
+                            <label asp-for="ServiceId" class="form-label fw-bold">Select Service</label>
+                            <select asp-for="ServiceId" class="form-select" id="serviceSelect">
+                                <option value="">-- Choose a service --</option>
+                                @if (ViewBag.Services != null)
+                                {
+                                    foreach (var service in ViewBag.Services)
+                                    {
+                                        <option value="@service.Id" data-price="@service.Price">@service.Name (@service.Price EGP)</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="ServiceId" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Customer Phone -->
+                        <div class="mb-3">
+                            <label asp-for="CustomerId" class="form-label fw-bold">Customer ID / Phone</label>
+                            <input asp-for="CustomerId" class="form-control" placeholder="Enter your user ID or phone" />
+                            <span asp-validation-for="CustomerId" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Appointment Date -->
+                        <div class="mb-3">
+                            <label asp-for="AppointmentDate" class="form-label fw-bold">Appointment Date</label>
+                            <input asp-for="AppointmentDate" type="date" class="form-control" />
+                            <span asp-validation-for="AppointmentDate" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Appointment Time -->
+                        <div class="mb-3">
+                            <label asp-for="AppointmentTime" class="form-label fw-bold">Appointment Time</label>
+                            <input asp-for="AppointmentTime" type="time" class="form-control" />
+                            <span asp-validation-for="AppointmentTime" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Price -->
+                        <div class="mb-3">
+                            <label asp-for="Price" class="form-label fw-bold">Agreed Price (EGP)</label>
+                            <input asp-for="Price" type="number" step="0.01" class="form-control" id="priceInput" placeholder="Enter or select service price" />
+                            <span asp-validation-for="Price" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="mb-3">
+                            <label asp-for="Notes" class="form-label fw-bold">Additional Notes / Symptoms</label>
+                            <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Describe any specific issues with your vehicle..."></textarea>
+                            <span asp-validation-for="Notes" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <a asp-controller="ServiceCenters" asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-1"></i> Back
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4 fw-bold">
+                                <i class="bi bi-check-circle me-1"></i> Confirm Booking
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-fill price when selecting a service from the dropdown
+        document.getElementById('serviceSelect').addEventListener('change', function () {
+            var selectedOption = this.options[this.selectedIndex];
+            var price = selectedOption.getAttribute('data-price');
+            if (price) {
+                document.getElementById('priceInput').value = price;
+            }
+        });
+    </script>
+}

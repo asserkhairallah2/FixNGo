@@ -1,0 +1,179 @@
+@model IReadOnlyList<ProviderRequestSummaryDto>
+@{
+    ViewData["Title"] = "Incoming Assistance Requests - FixNGo";
+    bool isOnline = ViewBag.IsOnline ?? false;
+    var verificationStatus = ViewBag.VerificationStatus ?? VerificationStatus.Pending;
+}
+
+<!-- Flash Alerts -->
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["Info"] != null)
+{
+    <div class="alert alert-info alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+        <i class="bi bi-info-circle-fill me-2"></i>@TempData["Info"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<!-- Header -->
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4 pb-2 border-bottom">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1 small">
+                <li class="breadcrumb-item"><a asp-action="Dashboard" class="text-secondary text-decoration-none">Dashboard</a></li>
+                <li class="breadcrumb-item active text-body" aria-current="page">Incoming Requests</li>
+            </ol>
+        </nav>
+        <h2 class="fw-bold mb-1">Incoming Assistance Requests</h2>
+        <p class="text-secondary mb-0">Review nearby roadside breakdown tickets and accept missions within your coverage zone.</p>
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+        @if (isOnline)
+        {
+            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fs-6">
+                <i class="bi bi-broadcast me-1"></i>RADAR ONLINE
+            </span>
+        }
+        else
+        {
+            <span class="badge bg-secondary-subtle text-secondary border px-3 py-2 fs-6">
+                <i class="bi bi-power me-1"></i>RADAR OFFLINE
+            </span>
+            <form asp-action="ToggleAvailability" method="post" class="m-0">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-emergency btn-sm px-3 fw-bold">Go Online</button>
+            </form>
+        }
+    </div>
+</div>
+
+<!-- Service Type Filter Buttons -->
+<div class="d-flex flex-wrap gap-2 mb-4">
+    <a asp-action="Requests" asp-route-serviceType="" class="btn btn-sm @(ViewBag.SelectedServiceType == null ? "btn-warning fw-bold" : "btn-outline-secondary")">
+        All Categories
+    </a>
+    <a asp-action="Requests" asp-route-serviceType="@AssistanceType.Mechanic" class="btn btn-sm @(ViewBag.SelectedServiceType == AssistanceType.Mechanic ? "btn-warning fw-bold" : "btn-outline-secondary")">
+        <i class="bi bi-wrench-adjustable me-1"></i>Mechanic
+    </a>
+    <a asp-action="Requests" asp-route-serviceType="@AssistanceType.TireService" class="btn btn-sm @(ViewBag.SelectedServiceType == AssistanceType.TireService ? "btn-warning fw-bold" : "btn-outline-secondary")">
+        <i class="bi bi-disc me-1"></i>Tire Service
+    </a>
+    <a asp-action="Requests" asp-route-serviceType="@AssistanceType.BatteryService" class="btn btn-sm @(ViewBag.SelectedServiceType == AssistanceType.BatteryService ? "btn-warning fw-bold" : "btn-outline-secondary")">
+        <i class="bi bi-battery-charging me-1"></i>Battery
+    </a>
+    <a asp-action="Requests" asp-route-serviceType="@AssistanceType.Towing" class="btn btn-sm @(ViewBag.SelectedServiceType == AssistanceType.Towing ? "btn-warning fw-bold" : "btn-outline-secondary")">
+        <i class="bi bi-truck-flatbed me-1"></i>Towing
+    </a>
+    <a asp-action="Requests" asp-route-serviceType="@AssistanceType.FuelDelivery" class="btn btn-sm @(ViewBag.SelectedServiceType == AssistanceType.FuelDelivery ? "btn-warning fw-bold" : "btn-outline-secondary")">
+        <i class="bi bi-fuel-pump me-1"></i>Fuel Delivery
+    </a>
+</div>
+
+@if (!isOnline)
+{
+    <div class="alert alert-dark border p-4 rounded-4 mb-4 text-center">
+        <i class="bi bi-exclamation-circle-fill fs-2 text-warning mb-2 d-block"></i>
+        <h5 class="fw-bold">Your Status is Offline</h5>
+        <p class="text-secondary mb-3">You will not receive new roadside assistance dispatches until you switch your status to <strong>Online</strong>.</p>
+        <form asp-action="ToggleAvailability" method="post" class="d-inline">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-emergency px-4 fw-bold shadow-sm">
+                <i class="bi bi-power me-1"></i> Connect & Go Online
+            </button>
+        </form>
+    </div>
+}
+
+@if (Model == null || !Model.Any())
+{
+    <div class="card border bg-body-tertiary rounded-4 shadow-sm p-5 text-center">
+        <i class="bi bi-inbox fs-1 text-secondary mb-3 d-block"></i>
+        <h4 class="fw-bold">No Open Requests Right Now</h4>
+        <p class="text-secondary mb-0">All current roadside assistance requests in your sector have been dispatched or fulfilled. Keep your radar online to receive incoming tickets.</p>
+    </div>
+}
+else
+{
+    <div class="d-flex flex-column gap-3">
+        @foreach (var req in Model)
+        {
+            <div class="card border @(req.IsP0Emergency ? "border-danger border-opacity-50 bg-danger bg-opacity-10" : "bg-body-tertiary") rounded-4 shadow-sm p-4">
+                <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3">
+                    <div class="flex-grow-1">
+                        <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                            @if (req.IsP0Emergency)
+                            {
+                                <span class="badge bg-danger text-white fw-bold px-2 py-1">
+                                    <i class="bi bi-exclamation-triangle-fill me-1"></i>P0 EMERGENCY
+                                </span>
+                            }
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">
+                                @req.ServiceType
+                            </span>
+                            <span class="badge bg-secondary-subtle text-body border px-2 py-1">
+                                Ticket #@req.Id
+                            </span>
+                            <span class="text-secondary small">
+                                <i class="bi bi-clock me-1"></i>Requested @req.CreatedAt.ToLocalTime().ToString("hh:mm tt")
+                            </span>
+                        </div>
+
+                        <h4 class="fw-bold mb-2">@req.ProblemDescription</h4>
+
+                        <div class="row row-cols-1 row-cols-md-3 g-2 text-secondary small mb-2">
+                            <div>
+                                <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+                                <strong>Location:</strong> @req.CustomerAddress
+                            </div>
+                            <div>
+                                <i class="bi bi-car-front text-info me-1"></i>
+                                <strong>Vehicle:</strong> @(string.IsNullOrEmpty(req.VehicleInfo) ? "Not Specified" : req.VehicleInfo)
+                            </div>
+                            <div>
+                                <i class="bi bi-person-fill text-warning me-1"></i>
+                                <strong>Driver:</strong> @req.CustomerName
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions & Fare -->
+                    <div class="text-lg-end d-flex flex-row flex-lg-column align-items-center align-items-lg-end justify-content-between w-100 w-lg-auto gap-3 pt-3 pt-lg-0 border-top border-lg-0">
+                        <div>
+                            <span class="text-secondary small d-block">Estimated Fare</span>
+                            <span class="fw-bold fs-4 text-warning">@req.EstimatedFare.ToString("N0") EGP</span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a asp-action="RequestDetails" asp-route-id="@req.Id" class="btn btn-outline-secondary px-3">
+                                Details
+                            </a>
+                            <form asp-action="RejectRequest" asp-route-id="@req.Id" method="post" class="m-0" onsubmit="return confirm('Decline this assistance request offer?');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-outline-danger px-3">Decline</button>
+                            </form>
+                            <form asp-action="AcceptRequest" asp-route-id="@req.Id" method="post" class="m-0">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-emergency px-4 fw-bold shadow">
+                                    <i class="bi bi-check2-circle me-1"></i> Accept Mission
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

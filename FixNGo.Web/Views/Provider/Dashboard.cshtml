@@ -1,0 +1,283 @@
+@model ProviderDashboardDto
+@{
+    ViewData["Title"] = "Provider Dashboard - FixNGo";
+}
+
+<!-- Notification Alerts -->
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<!-- Top Header with Status Controls -->
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4 pb-2 border-bottom">
+    <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+            <h2 class="fw-bold mb-0">Provider Operations Center</h2>
+            @if (Model.VerificationStatus == VerificationStatus.Verified)
+            {
+                <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                    <i class="bi bi-patch-check-fill me-1"></i>Verified Provider
+                </span>
+            }
+            else
+            {
+                <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1">
+                    <i class="bi bi-clock-history me-1"></i>Verification: @Model.VerificationStatus
+                </span>
+            }
+        </div>
+        <p class="text-secondary mb-0">
+            Welcome back, <strong>@Model.ProviderName</strong> • Operating in @Model.OperatingCity
+        </p>
+    </div>
+
+    <!-- Online / Offline Availability Toggle -->
+    <div class="d-flex align-items-center gap-3 bg-body-tertiary p-2 px-3 rounded-4 border">
+        <div class="d-flex align-items-center gap-2">
+            @if (Model.IsOnline)
+            {
+                <span class="spinner-grow spinner-grow-sm text-success" role="status"></span>
+                <span class="fw-bold text-success">ONLINE</span>
+            }
+            else
+            {
+                <i class="bi bi-circle-fill text-secondary" style="font-size: 10px;"></i>
+                <span class="fw-bold text-secondary">OFFLINE</span>
+            }
+        </div>
+        <form asp-controller="Provider" asp-action="ToggleAvailability" method="post" class="m-0">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-sm @(Model.IsOnline ? "btn-outline-danger" : "btn-success") fw-semibold px-3 rounded-3">
+                @(Model.IsOnline ? "Go Offline" : "Go Online")
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Key Performance Metrics Row -->
+<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3 mb-4">
+    <!-- Rating -->
+    <div class="col">
+        <div class="card h-100 border bg-body-tertiary rounded-4 shadow-sm p-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-secondary small fw-semibold">PROVIDER RATING</span>
+                <span class="p-2 rounded-3 bg-warning bg-opacity-10 text-warning"><i class="bi bi-star-fill"></i></span>
+            </div>
+            <h3 class="fw-bold mb-1">@Model.Rating.ToString("F1") <span class="fs-6 text-secondary fw-normal">/ 5.0</span></h3>
+            <span class="text-secondary small">Based on @Model.TotalReviews verified reviews</span>
+        </div>
+    </div>
+
+    <!-- Completed Missions -->
+    <div class="col">
+        <div class="card h-100 border bg-body-tertiary rounded-4 shadow-sm p-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-secondary small fw-semibold">COMPLETED MISSIONS</span>
+                <span class="p-2 rounded-3 bg-success bg-opacity-10 text-success"><i class="bi bi-shield-check"></i></span>
+            </div>
+            <h3 class="fw-bold mb-1">@Model.CompletedJobsCount</h3>
+            <span class="text-success small fw-semibold"><i class="bi bi-arrow-up-right"></i> 100% completion rate</span>
+        </div>
+    </div>
+
+    <!-- Total Gross Earnings -->
+    <div class="col">
+        <div class="card h-100 border bg-body-tertiary rounded-4 shadow-sm p-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-secondary small fw-semibold">TOTAL EARNINGS</span>
+                <span class="p-2 rounded-3 bg-primary bg-opacity-10 text-primary"><i class="bi bi-cash-stack"></i></span>
+            </div>
+            <h3 class="fw-bold mb-1">@Model.TotalGrossEarnings.ToString("N0") <span class="fs-6 text-secondary fw-normal">EGP</span></h3>
+            <span class="text-secondary small">Today: +@Model.TodayEarnings.ToString("N0") EGP</span>
+        </div>
+    </div>
+
+    <!-- Payable / Pending Settlement -->
+    <div class="col">
+        <div class="card h-100 border bg-body-tertiary rounded-4 shadow-sm p-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-secondary small fw-semibold">PENDING SETTLEMENT</span>
+                <span class="p-2 rounded-3 bg-warning bg-opacity-10 text-warning"><i class="bi bi-wallet2"></i></span>
+            </div>
+            <h3 class="fw-bold mb-1 text-warning">@Model.PayableEarnings.ToString("N0") <span class="fs-6 text-secondary fw-normal">EGP</span></h3>
+            <span class="text-secondary small">Paid: @Model.PaidEarnings.ToString("N0") EGP</span>
+        </div>
+    </div>
+</div>
+
+<!-- Active Mission Banner (If in progress) -->
+@if (Model.ActiveRequest != null)
+{
+    <div class="card border border-warning bg-warning bg-opacity-10 rounded-4 shadow-sm mb-4 p-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-warning text-dark fw-bold px-2 py-1">
+                        <i class="bi bi-lightning-charge-fill me-1"></i>ACTIVE MISSION IN PROGRESS
+                    </span>
+                    <span class="badge bg-secondary-subtle text-body border px-2 py-1">Ticket #@Model.ActiveRequest.Id</span>
+                    <span class="badge bg-info-subtle text-info border border-info-subtle">@Model.ActiveRequest.Status</span>
+                </div>
+                <h4 class="fw-bold mb-1">@Model.ActiveRequest.ServiceType Roadside Assistance</h4>
+                <p class="text-body-secondary mb-1">
+                    <i class="bi bi-geo-alt-fill text-danger me-1"></i>@Model.ActiveRequest.CustomerAddress
+                </p>
+                <div class="small text-secondary">
+                    Driver: <strong>@Model.ActiveRequest.CustomerName</strong> (@Model.ActiveRequest.CustomerPhone) • Vehicle: @Model.ActiveRequest.VehicleInfo
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <a asp-action="ActiveRequest" class="btn btn-warning fw-bold px-4 py-2 shadow-sm d-flex align-items-center gap-2">
+                    <i class="bi bi-compass"></i> Open Live Mission Tracker <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Main Row: Incoming Requests & Quick Navigation -->
+<div class="row g-4 mb-4">
+    <!-- Incoming Assistance Requests Column -->
+    <div class="col-lg-8">
+        <div class="card border bg-body-tertiary rounded-4 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="fw-bold mb-1"><i class="bi bi-bell-fill text-warning me-2"></i>Incoming Assistance Requests</h5>
+                    <p class="text-secondary small mb-0">Open requests nearby ready for dispatch acceptance</p>
+                </div>
+                <a asp-action="Requests" class="btn btn-sm btn-outline-secondary">View All</a>
+            </div>
+            <div class="card-body p-4">
+                @if (!Model.IsOnline)
+                {
+                    <div class="alert alert-dark border p-4 rounded-3 text-center">
+                        <i class="bi bi-power fs-2 text-warning mb-2 d-block"></i>
+                        <h6 class="fw-bold">You are currently OFFLINE</h6>
+                        <p class="text-secondary small mb-3">Turn your status to <strong>Online</strong> to start receiving new roadside rescue calls.</p>
+                        <form asp-controller="Provider" asp-action="ToggleAvailability" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-emergency btn-sm px-4 fw-semibold">Go Online Now</button>
+                        </form>
+                    </div>
+                }
+                else if (Model.IncomingRequests == null || !Model.IncomingRequests.Any())
+                {
+                    <div class="alert alert-secondary border-0 p-4 rounded-3 text-center">
+                        <i class="bi bi-inbox fs-2 text-secondary mb-2 d-block"></i>
+                        <h6 class="fw-bold">No Pending Requests In Your Zone</h6>
+                        <p class="text-secondary small mb-0">Your radio is connected. As soon as a nearby vehicle requests assistance, it will show up here immediately.</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="d-flex flex-column gap-3">
+                        @foreach (var req in Model.IncomingRequests)
+                        {
+                            <div class="p-3 rounded-3 border bg-dark bg-opacity-25 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        @if (req.IsP0Emergency)
+                                        {
+                                            <span class="badge bg-danger text-white fw-bold px-2 py-1">P0 EMERGENCY</span>
+                                        }
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle">@req.ServiceType</span>
+                                        <span class="text-secondary small">#@req.Id • @req.CreatedAt.ToLocalTime().ToString("hh:mm tt")</span>
+                                    </div>
+                                    <h6 class="fw-bold mb-1">@req.ProblemDescription</h6>
+                                    <p class="text-secondary small mb-0">
+                                        <i class="bi bi-geo-alt-fill text-danger me-1"></i>@req.CustomerAddress
+                                    </p>
+                                    <small class="text-secondary">Vehicle: @req.VehicleInfo • Driver: @req.CustomerName</small>
+                                </div>
+                                <div class="text-md-end d-flex flex-row flex-md-column align-items-center align-items-md-end justify-content-between w-100 w-md-auto gap-2">
+                                    <div class="fw-bold fs-5 text-warning">@req.EstimatedFare.ToString("N0") EGP</div>
+                                    <div class="d-flex gap-2">
+                                        <a asp-action="RequestDetails" asp-route-id="@req.Id" class="btn btn-outline-secondary btn-sm px-3">Details</a>
+                                        <form asp-action="AcceptRequest" asp-route-id="@req.Id" method="post" class="m-0">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-emergency btn-sm px-3 fw-bold">Accept</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Navigation & Operations Column -->
+    <div class="col-lg-4">
+        <div class="card border bg-body-tertiary rounded-4 shadow-sm p-4 h-100">
+            <h5 class="fw-bold mb-3"><i class="bi bi-grid-fill text-warning me-2"></i>Provider Navigation</h5>
+            <div class="list-group list-group-flush gap-2">
+                <a asp-action="Requests" class="list-group-item list-group-item-action rounded-3 border-0 py-3 bg-dark bg-opacity-25 d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-inbox-fill text-warning fs-5 me-3"></i>
+                        <div>
+                            <div class="fw-semibold">Incoming Requests</div>
+                            <small class="text-secondary">View and filter requests</small>
+                        </div>
+                    </div>
+                    <i class="bi bi-chevron-right text-secondary"></i>
+                </a>
+
+                <a asp-action="ActiveRequest" class="list-group-item list-group-item-action rounded-3 border-0 py-3 bg-dark bg-opacity-25 d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-compass-fill text-info fs-5 me-3"></i>
+                        <div>
+                            <div class="fw-semibold">Active Mission Tracker</div>
+                            <small class="text-secondary">Status, GPS & chat with customer</small>
+                        </div>
+                    </div>
+                    <i class="bi bi-chevron-right text-secondary"></i>
+                </a>
+
+                <a asp-action="Earnings" class="list-group-item list-group-item-action rounded-3 border-0 py-3 bg-dark bg-opacity-25 d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-cash-coin text-success fs-5 me-3"></i>
+                        <div>
+                            <div class="fw-semibold">Earnings & Settlement</div>
+                            <small class="text-secondary">Track revenue and payments</small>
+                        </div>
+                    </div>
+                    <i class="bi bi-chevron-right text-secondary"></i>
+                </a>
+
+                <a asp-action="History" class="list-group-item list-group-item-action rounded-3 border-0 py-3 bg-dark bg-opacity-25 d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-clock-history text-primary fs-5 me-3"></i>
+                        <div>
+                            <div class="fw-semibold">Service History</div>
+                            <small class="text-secondary">Completed and cancelled missions</small>
+                        </div>
+                    </div>
+                    <i class="bi bi-chevron-right text-secondary"></i>
+                </a>
+
+                <a asp-action="Profile" class="list-group-item list-group-item-action rounded-3 border-0 py-3 bg-dark bg-opacity-25 d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-person-badge-fill text-secondary fs-5 me-3"></i>
+                        <div>
+                            <div class="fw-semibold">Provider Profile</div>
+                            <small class="text-secondary">Credentials, license & vehicle</small>
+                        </div>
+                    </div>
+                    <i class="bi bi-chevron-right text-secondary"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
