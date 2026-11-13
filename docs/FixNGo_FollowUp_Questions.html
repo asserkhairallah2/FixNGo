@@ -1,0 +1,1785 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>أسئلة المتابعة الشاملة - مشروع FixNGo</title>
+    <style>
+        
+
+        @page {
+            size: A4;
+            margin: 12mm 12mm 14mm 12mm;
+            @bottom-center {
+                content: counter(page);
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #1a202c;
+            background-color: #ffffff;
+            line-height: 1.55;
+            font-size: 12.5px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+            margin-bottom: 18px;
+            font-size: 11px;
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .main-header {
+            margin-bottom: 24px;
+            border-bottom: 3px solid #fd7e14;
+            padding-bottom: 14px;
+        }
+
+        .main-title {
+            font-size: 26px;
+            font-weight: 900;
+            color: #0f172a;
+            margin: 0 0 6px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .main-title .badge-project {
+            background-color: #fd7e14;
+            color: #ffffff;
+            font-size: 14px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 800;
+        }
+
+        .subtitle {
+            font-size: 13.5px;
+            color: #475569;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .section-block {
+            margin-bottom: 26px;
+            page-break-inside: auto;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: #ffffff;
+            padding: 9px 16px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            page-break-after: avoid;
+        }
+
+        .section-header .section-tag {
+            background: rgba(253, 126, 20, 0.9);
+            color: #ffffff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .questions-summary {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-right: 4px solid #fd7e14;
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            page-break-after: avoid;
+        }
+
+        .questions-summary h4 {
+            margin: 0 0 8px 0;
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .questions-summary ol {
+            margin: 0;
+            padding-right: 20px;
+            color: #334155;
+            font-size: 13px;
+        }
+
+        .questions-summary li {
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .evidence-heading {
+            font-size: 14px;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 16px 0 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            page-break-after: avoid;
+        }
+
+        .evidence-heading::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: #fd7e14;
+            border-radius: 50%;
+        }
+
+        table.qna-table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: separate;
+            border-spacing: 0;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 18px;
+            font-size: 11.5px;
+            page-break-inside: auto;
+        }
+
+        table.qna-table tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
+
+        table.qna-table th {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            font-weight: 800;
+            padding: 8px 10px;
+            text-align: right;
+            border-bottom: 2px solid #cbd5e1;
+            border-left: 1px solid #cbd5e1;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        table.qna-table th:last-child {
+            border-left: none;
+        }
+
+        table.qna-table td {
+            padding: 8px 10px;
+            vertical-align: top;
+            border-bottom: 1px solid #e2e8f0;
+            border-left: 1px solid #e2e8f0;
+            color: #1e293b;
+            line-height: 1.5;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        table.qna-table td:last-child {
+            border-left: none;
+        }
+
+        table.qna-table tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        table.qna-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .col-id {
+            width: 5.5%;
+            text-align: center !important;
+            font-weight: 800;
+            color: #64748b;
+            white-space: nowrap !important;
+        }
+
+        .col-question {
+            width: 25.5%;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .col-answer {
+            width: 48%;
+        }
+
+        .col-source {
+            width: 21%;
+            font-weight: 600;
+            color: #475569;
+            font-size: 10.5px;
+        }
+
+        .badge-ref {
+            display: inline-block;
+            background-color: #e0f2fe;
+            color: #0369a1;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 10px;
+            border: 1px solid #bae6fd;
+            margin-bottom: 3px;
+            max-width: 100%;
+            word-break: break-all;
+            white-space: normal;
+        }
+
+        .badge-lecture {
+            display: inline-block;
+            background-color: #fef3c7;
+            color: #92400e;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 10px;
+            border: 1px solid #fde68a;
+            margin-bottom: 3px;
+            max-width: 100%;
+            word-break: break-all;
+            white-space: normal;
+        }
+
+        .badge-code {
+            display: inline-block;
+            background-color: #f1f5f9;
+            color: #334155;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-family: Consolas, monospace;
+            font-size: 10px;
+            border: 1px solid #cbd5e1;
+            direction: ltr;
+            margin-bottom: 3px;
+            max-width: 100%;
+            word-break: break-all;
+            white-space: normal;
+        }
+
+        .code-snippet {
+            display: block;
+            direction: ltr;
+            text-align: left;
+            font-family: Consolas, 'Courier New', monospace;
+            background: #0f172a;
+            color: #38bdf8;
+            padding: 6px 10px;
+            font-size: 10.5px;
+            margin-top: 5px;
+            line-height: 1.4;
+            border-radius: 5px;
+            word-break: break-all;
+            white-space: pre-wrap;
+            overflow-x: hidden;
+            box-sizing: border-box;
+            max-width: 100%;
+        }
+
+        .strong-point {
+            color: #c2410c;
+            font-weight: 800;
+        }
+
+        .answer-list {
+            margin: 4px 0 0 0;
+            padding-right: 16px;
+        }
+
+        .answer-list li {
+            margin-bottom: 3px;
+        }
+
+        .footer-note {
+            margin-top: 30px;
+            padding-top: 14px;
+            border-top: 1px dashed #cbd5e1;
+            text-align: center;
+            font-size: 11.5px;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-top">
+        <span>مشروع FixNGo — مبادرة رواد مصر الرقمية (DEPI)</span>
+        <span>دليل المناقشة الشامل وأسئلة المتابعة والتقييم</span>
+    </div>
+
+    <div class="main-header">
+        <h1 class="main-title">
+            أسئلة المتابعة والمناقشة الشاملة
+            <span class="badge-project">FixNGo Platform</span>
+        </h1>
+        <p class="subtitle">
+            دليل إجابات نموذجي متكامل يربط كل سؤال بكود المشروع الفعلي، بنية الـ Clean Architecture، ووثيقة مواصفات المتطلبات (SRS Version 1.0).
+        </p>
+    </div>
+
+    <div class="section-block">
+        <div class="section-header">
+            <span>1. البزنس وطريقة الشغل بالـ AI (Business Logic & AI Workflow)</span>
+            <span class="section-tag">12 سؤال وإجابة نموذجية</span>
+        </div>
+
+        <div class="questions-summary">
+            <h4>قائمة الأسئلة السريعة:</h4>
+            <ol>
+                <li>اشرحلي المشروع في 30 ثانية من غير ولا كلمة تقنية: المشكلة إيه والحل إيه؟</li>
+                <li>مين الـ Actors في السيستم؟ وكل واحد مسموحله يعمل إيه؟</li>
+                <li>وريني الـ SRS: فين الـ FR والـ BR والـ NFR؟</li>
+                <li>اختار Business Rule من الـ SRS، ووريني متطبقة فين في الكود.</li>
+                <li>أنهي Feature السيستم مالوش لازمة من غيرها؟</li>
+                <li>إيه اللي يميز مشروعكم عن أي حل موجود؟ وريوهولي شغال.</li>
+                <li>قسمتوا الشغل إزاي؟ وريني الـ Features والـ Tasks والـ Cycles.</li>
+                <li>وريني الـ Specs Classes اللي طلعت منها الـ Entities.</li>
+                <li>وريني الـ Agent File: فيه إيه؟ وليه بنكتبه؟</li>
+                <li>وريني الـ State File: آخر حاجة اتسجلت فيه إيه؟ وبتحدثه إمتى؟</li>
+                <li>مين اللي بيخطط ومين اللي بينفذ في شغلك مع الـ AI؟ وليه بنفصلهم؟</li>
+                <li>اختار Cycle واحدة واحكيلي اتعملت إزاي، من أول ما طلبتها من الـ AI لحد ما راجعتها.</li>
+            </ol>
+        </div>
+
+        <div class="evidence-heading">الدليل النموذجي والإجابات التفصيلية من واقع كود ومواصفات FixNGo:</div>
+
+        <table class="qna-table">
+            <thead>
+                <tr>
+                    <th class="col-id">#</th>
+                    <th class="col-question">السؤال</th>
+                    <th class="col-answer">الإجابة النموذجية والدليل من كود وتطبيق FixNGo</th>
+                    <th class="col-source">المرجع من المشروع</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="col-id">1</td>
+                    <td class="col-question">اشرحلي المشروع في 30 ثانية من غير ولا كلمة تقنية: المشكلة إيه والحل إيه؟</td>
+                    <td class="col-answer">
+                        «أصحاب السيارات في مصر لما عربيتهم بتعطل فجأة على الطريق (زي طريق السويس، الواحات، الدائري)، بيعانوا من التوتر والبهدلة عشان يلاقوا ونش سحب أو ميكانيكي أمين، وبيتعرضوا للابتزاز في الأسعار وصعوبة وصف مكانهم. 
+                        <strong>منصة FixNGo</strong> بتحل المشكلة بضغطة زر؛ بتحدد مكان السائق بالـ GPS وبترشحله أوتوماتيك أقرب ونش أو ميكانيكي متاح مع تسعير واضح ومسبق وتتبع حي على الخريطة، بجانب إمكانية حجز مواعيد صيانة دورية في مراكز معتمدة بدون وسيط».
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-ref">SRS: Section 1.1</span><br/>
+                        <span class="badge-ref">Product Purpose</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">2</td>
+                    <td class="col-question">مين الـ Actors في السيستم؟ وكل واحد مسموحله يعمل إيه؟</td>
+                    <td class="col-answer">
+                        السيستم يحتوي على 4 أطراف رئيسية (Actors):
+                        <ul class="answer-list">
+                            <li><strong class="strong-point">العميل (Customer):</strong> تسجيل بيانات سياراته، طلب استغاثة طوارئ، تتبع المزود لايف، حجز مواعيد بمراكز الصيانة، والدفع والتقييم.</li>
+                            <li><strong class="strong-point">مقدم خدمة الطوارئ (Provider - Mechanic/Tow):</strong> تشغيل وضع التوفر (Online/Offline)، استلام إشعارات الطوارئ، قبول/رفض الطلبات، تحديث مراحل الرحلة لحظياً.</li>
+                            <li><strong class="strong-point">مركز الصيانة (Service Center):</strong> إدارة باقات الصيانة والأسعار، تحديد ساعات وأيام العمل الأسبوعية، تأكيد أو رفض حجوزات الصيانة.</li>
+                            <li><strong class="strong-point">المدير (Admin):</strong> مراقبة المنصة، فحص واعتماد تراخيص ومستندات المزودين (KYC)، التدخل لتنسيق أو إلغاء البلاغات، وإدارة الحسابات.</li>
+                        </ul>
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-ref">SRS: Section 2.3</span><br/>
+                        <span class="badge-code">ApplicationUser.cs</span><br/>
+                        <span class="badge-lecture">ASP S10 Identity</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">3</td>
+                    <td class="col-question">وريني الـ SRS: فين الـ FR والـ BR والـ NFR؟</td>
+                    <td class="col-answer">
+                        <ul class="answer-list">
+                            <li><strong class="strong-point">الـ FR (Functional):</strong> في Section 4 (من FR-01 إلى FR-45)، زي: FR-10 طلب الإغاثة، FR-16 ترشيح نوع المساعدة، FR-23 التتبع المباشر بالخريطة، FR-32 حجز المركز.</li>
+                            <li><strong class="strong-point">الـ BR (Business Rules):</strong> القواعد الإلزامية في الكود، زي: عدم مطابقة أي طلب إلا مع مزود موثق (Verified)، حمولة الونش بين 0.5 إلى 50 طن، وحظر الحجز في تواريخ ماضية.</li>
+                            <li><strong class="strong-point">الـ NFR (Non-Functional):</strong> في Section 5 (من NFR-01 إلى NFR-18)، زي: NFR-01 الاستجابة في أقل من 5 ثوانٍ، NFR-03 تحديث الـ GPS كل 5 ثوانٍ، و NFR-04 دعم 1,000 مستخدم متزامن.</li>
+                        </ul>
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-ref">SRS: Sec 4 &amp; 5</span><br/>
+                        <span class="badge-lecture">ورشة الـ AI الأولى</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">4</td>
+                    <td class="col-question">اختار Business Rule من الـ SRS، ووريني متطبقة فين في الكود.</td>
+                    <td class="col-answer">
+                        <strong class="strong-point">القاعدة:</strong> «حظر حجز أي موعد صيانة في تاريخ ماضٍ، ومنع تسجيل أسعار خدمات سالبة أو صفرية، واشتراط توثيق هوية مقدم الخدمة قبل نزوله الخدمة».<br/>
+                        <strong class="strong-point">تطبيقها بالكود:</strong>
+                        <ul class="answer-list">
+                            <li>في <span class="badge-code">BookingsController.cs</span> سطر 76: فحص <span class="badge-code">booking.AppointmentDate &lt; DateOnly.FromDateTime(DateTime.Today)</span>.</li>
+                            <li>في <span class="badge-code">Service.cs</span> ميثود <span class="badge-code">UpdatePrice()</span>: ترمي استثناء لو السعر أقل من أو يساوي صفر.</li>
+                            <li>في <span class="badge-code">Validators.cs</span> باستخدام FluentValidation لفحص كفاءة البيانات على مستوى السيرفر.</li>
+                        </ul>
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">BookingValidator.cs</span><br/>
+                        <span class="badge-code">Service.cs</span><br/>
+                        <span class="badge-lecture">ASP S05 Validation</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">5</td>
+                    <td class="col-question">أنهي Feature السيستم مالوش لازمة من غيرها؟</td>
+                    <td class="col-answer">
+                        ميزة <strong class="strong-point">«طلب الاستغاثة الطارئة والمطابقة الجغرافية اللحظية مع الأوناش والميكانيكية» (Emergency Dispatch &amp; Matching - FR-10..FR-22)</strong>.<br/>
+                        السبب: ميزة مراكز الصيانة أو التقييمات تقدمها منصات كثيرة، لكن القيمة الجوهرية (Core Value Proposition) لـ FixNGo التي أُنشئ المشروع لأجلها هي إنقاذ السائق العالق على الطريق الصحراوي في دقائق معدودة.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-ref">SRS: FR-10..FR-22</span><br/>
+                        <span class="badge-ref">Core Feature</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">6</td>
+                    <td class="col-question">إيه اللي يميز مشروعكم عن أي حل موجود؟ وريوهولي شغال.</td>
+                    <td class="col-answer">
+                        <strong class="strong-point">التكامل التام بين طوارئ الطرق السريعة ومراكز الصيانة المعتمدة في منصة واحدة</strong> مع:
+                        1) تسعير فوري ومحدد مسبقاً (Fixed &amp; Transparent Fares) يمنع استغلال السائقين.<br/>
+                        2) تتبع رحلة الونش خطوة بخطوة بـ 5 مراحل محددة (`TowTripStage`) عبر شاشة <span class="badge-code">/TowProvider/ActiveTow</span>.<br/>
+                        3) لوحة تحكم ذكية للأدمن في <span class="badge-code">/Admin/Requests</span> تمكنه من التدخل وإعادة توجيه ونش آخر فوراً إذا تعذر وصول الأول.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">TowProvider/ActiveTow</span><br/>
+                        <span class="badge-code">Admin/Requests</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">7</td>
+                    <td class="col-question">قسمتوا الشغل إزاي؟ وريني الـ Features والـ Tasks والـ Cycles.</td>
+                    <td class="col-answer">
+                        اتبعنا تقسيم الـ Iterative Cycles المنهجي:
+                        <ul class="answer-list">
+                            <li><strong class="strong-point">Cycle 1 (Core Architecture &amp; Identity):</strong> إنشاء الـ Clean Architecture، إعداد الهوية وتوزيع الـ Roles، وتهيئة EF Core مع SQLite/SQL Server.</li>
+                            <li><strong class="strong-point">Cycle 2 (Emergency Dispatch Loop):</strong> شاشات الميكانيكي والونش، إدارة مراحل السحب والتوفر وتحديث البيانات والـ Validation.</li>
+                            <li><strong class="strong-point">Cycle 3 (Service Centers, Bookings &amp; Admin):</strong> دليل المراكز والبحث والفلترة والترقيم، شاشات حجز المواعيد، ولوحة تحكم المشرف (Admin Governance).</li>
+                        </ul>
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-ref">TEAM_SPEC_CONTRACT.md</span><br/>
+                        <span class="badge-lecture">ورشة إدارة المشاريع بالـ AI</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">8</td>
+                    <td class="col-question">وريني الـ Specs Classes اللي طلعت منها الـ Entities.</td>
+                    <td class="col-answer">
+                        استُخرجت الكيانات من وثيقة الـ SRS ومخطط الـ Domain Analysis:<br/>
+                        1. مواصفات السائق والطلب أنتجت كيان <span class="badge-code">AssistanceRequest</span>.<br/>
+                        2. مواصفات تأهيل ومستندات الفنيين أنتجت <span class="badge-code">ProviderProfile</span>.<br/>
+                        3. مواصفات ورش الإصلاح والخدمات والأسعار أنتجت <span class="badge-code">ServiceCenter</span> و <span class="badge-code">Service</span> و <span class="badge-code">WorkingHours</span>.<br/>
+                        4. مواصفات حجز المواعيد أنتجت كيان <span class="badge-code">Booking</span> مع دورة حالاته الخمس.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">FixNGo.Domain/Entities</span><br/>
+                        <span class="badge-lecture">EF S03 Code-First</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">9</td>
+                    <td class="col-question">وريني الـ Agent File: فيه إيه؟ وليه بنكتبه؟</td>
+                    <td class="col-answer">
+                        موجود في <strong class="strong-point"><span class="badge-code">TEAM_SPEC_CONTRACT.md</span></strong> في جذر المشروع.<br/>
+                        <strong class="strong-point">محتواه:</strong> تعريف الـ Architecture (Clean Architecture)، قيود الطبقات، معايير التسمية (Naming Conventions)، معايير الـ Validation، وقائمة الـ Endpoints.<br/>
+                        <strong class="strong-point">ليه بنكتبه:</strong> حتى تبدأ أداة الـ AI ومطورو الفريق كل جلسة عمل (Session) بنفس السياق الموحد ولا يقوم الـ AI باختراع كود عشوائي أو كسر المعمارية المتفق عليها.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-ref">TEAM_SPEC_CONTRACT.md</span><br/>
+                        <span class="badge-lecture">ورشة الـ AI Context Files</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">10</td>
+                    <td class="col-question">وريني الـ State File: آخر حاجة اتسجلت فيه إيه؟ وبتحدثه إمتى؟</td>
+                    <td class="col-answer">
+                        مسجل في وثائق وسجلات التطوير وملف الـ Milestone Summary؛<br/>
+                        <strong class="strong-point">آخر ما سُجل:</strong> اكتمال دورة الأعمال للأطراف الثلاثة، اكتمال لوحة تحكم الأدمن، تطبيق البحث والفلترة والترقيم في استعراض المراكز، ونجاح الـ Build بنسبة 100% بدون أي أخطاء (0 Errors).<br/>
+                        <strong class="strong-point">موعد التحديث:</strong> يتم تحديثه في نهاية كل Cycle لضمان المتابعة وحفظ استهلاك الـ Tokens.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-ref">Project Session Logs</span><br/>
+                        <span class="badge-lecture">ورشة الـ AI State Track</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">11</td>
+                    <td class="col-question">مين اللي بيخطط ومين اللي بينفذ في شغلك مع الـ AI؟ وليه بنفصلهم؟</td>
+                    <td class="col-answer">
+                        <strong class="strong-point">المخطط (Planner):</strong> نموذج التفكير الاستراتيجي والـ Architecture (مثل Gemini / Claude Planner) لوضع المعمارية وتوزيع الطبقات وفحص الـ SRS.<br/>
+                        <strong class="strong-point">المنفذ (Executor):</strong> نماذج توليد الأكواد المتخصصة (Code Generator) لتنفيذ كلاسات محددة واختبارات الوحدة.<br/>
+                        <strong class="strong-point">سبب الفصل:</strong> لفصل التفكير الكلي الشامل عن التفاصيل التنفيذية الجزئية؛ فالمخطط يضمن عدم نسيان الـ Business والـ NFRs، والمنفذ يركز على كتابة كود نظيف بدون أخطاء ترجمة.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-ref">AI Multi-Agent Workflow</span><br/>
+                        <span class="badge-lecture">ورشة الـ AI Roles</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">12</td>
+                    <td class="col-question">اختار Cycle واحدة واحكيلي اتعملت إزاي، من أول ما طلبتها من الـ AI لحد ما راجعتها.</td>
+                    <td class="col-answer">
+                        <strong class="strong-point">دورة بناء شاشات الإدارة وتنسيق الطوارئ (Admin Cycle):</strong><br/>
+                        1. <span class="strong-point">الطلب:</span> طلبنا من الـ AI تصميم لوحة تحكم تمكن المشرف من ربط العميل بالمزود مع فحص الـ SRS.<br/>
+                        2. <span class="strong-point">الخطة:</span> حدد الـ AI بناء متحكم <span class="badge-code">AdminController</span> و 5 شاشات فرعية ونموذج <span class="badge-code">AdminViewModels</span>.<br/>
+                        3. <span class="strong-point">التنفيذ:</span> كُتب الكود مع ربط الداتابيز ومراعاة CSRF Protection.<br/>
+                        4. <span class="strong-point">المراجعة:</span> فحصنا توافق الـ Enums وتصحيح ربط العناوين، ثم بنينا المشروع واختبرنا توزيع البلاغات وعزل الصلاحيات بنجاح.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">AdminController.cs</span><br/>
+                        <span class="badge-ref">Admin Views</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section-block">
+        <div class="section-header">
+            <span>2. الوصول للداتابيز وتقنيات EF Core (Database Access &amp; EF Core)</span>
+            <span class="section-tag">12 سؤال وإجابة نموذجية</span>
+        </div>
+
+        <div class="questions-summary">
+            <h4>قائمة الأسئلة السريعة:</h4>
+            <ol>
+                <li>ربطت مشروعك بالداتابيز بأنهي طريقة؟</li>
+                <li>وريني الكلاس اللي بيربطك بالداتابيز.</li>
+                <li>الـ Connection String فين؟ وليه مش Hard Coded؟</li>
+                <li>الـ DbContextOptions بتتبني فين وإزاي؟</li>
+                <li>عملت الـ Mapping بأنهي طريقة؟ وريها لي.</li>
+                <li>الكويريز والعمليات بتكتبها فين؟</li>
+                <li>يعني إيه Repository، وليه استخدمته؟</li>
+                <li>افتح أي Repository: إيه اللي المفروض يكون فيه؟</li>
+                <li>ليه الـ Repository بياخد الـ DbContext في الـ Constructor بدل ما يعمل new؟</li>
+                <li>إزاي عملت Inject للـ Repository جوه الـ Controller أو الـ Service؟</li>
+                <li>وريني الـ Navigation Properties اللي بتمثل علاقة بين جدولين عندك.</li>
+                <li>افتح آخر Migration: فيها إيه، وبتقولك إيه عن الداتابيز؟</li>
+            </ol>
+        </div>
+
+        <div class="evidence-heading">الدليل النموذجي والإجابات التفصيلية من واقع كود ومواصفات FixNGo:</div>
+
+        <table class="qna-table">
+            <thead>
+                <tr>
+                    <th class="col-id">#</th>
+                    <th class="col-question">السؤال</th>
+                    <th class="col-answer">الإجابة النموذجية والدليل من كود وتطبيق FixNGo</th>
+                    <th class="col-source">المرجع من المشروع</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="col-id">1</td>
+                    <td class="col-question">ربطت مشروعك بالداتابيز بأنهي طريقة؟</td>
+                    <td class="col-answer">
+                        باستخدام <strong class="strong-point">Entity Framework Core 8.0 بطريقة Code-First</strong>؛ قمنا بكتابة كلاسات الـ C# Entities أولاً في مشروع <span class="badge-code">FixNGo.Domain</span>، ثم قمنا بتعريف العلاقات والقيود عبر Fluent API، وأنشأنا الـ Migrations لتوليد جداول قاعدة البيانات في SQL Server.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">FixNGo.Infrastructure</span><br/>
+                        <span class="badge-lecture">EF S03 Code-First</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">2</td>
+                    <td class="col-question">وريني الكلاس اللي بيربطك بالداتابيز.</td>
+                    <td class="col-answer">
+                        كلاس <strong class="strong-point"><span class="badge-code">AppDbContext.cs</span></strong> الموجود في المسار:<br/>
+                        <span class="badge-code">FixNGo.Infrastructure/Persistence/AppDbContext.cs</span><br/>
+                        وهو يرث من <span class="badge-code">IdentityDbContext&lt;ApplicationUser&gt;</span> ويحتوي على <span class="badge-code">DbSet</span> لكل الجداول: <span class="badge-code">AssistanceRequests</span>, <span class="badge-code">ProviderProfiles</span>, <span class="badge-code">ServiceCenters</span>, <span class="badge-code">Services</span>, <span class="badge-code">Bookings</span>, <span class="badge-code">WorkingHours</span>.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">AppDbContext.cs</span><br/>
+                        <span class="badge-lecture">EF S03 DbContext</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">3</td>
+                    <td class="col-question">الـ Connection String فين؟ وليه مش Hard Coded؟</td>
+                    <td class="col-answer">
+                        موجودة في ملف <span class="badge-code">FixNGo.Web/appsettings.json</span> تحت المفتاح <span class="badge-code">ConnectionStrings:DefaultConnection</span>.<br/>
+                        <strong class="strong-point">ليه مش Hard-Coded؟ لسببين جوهريين:</strong><br/>
+                        1. <strong class="strong-point">الأمان (Security):</strong> لمنع ظهور الـ Passwords وسيرفرات الداتابيز الحقيقية في الكود المرفوع على الـ Git.<br/>
+                        2. <strong class="strong-point">المرونة (Flexibility):</strong> إمكانية تغيير السيرفر بين الـ Development والـ Production دون الحاجة لإعادة عمل Recompile للكود.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">appsettings.json</span><br/>
+                        <span class="badge-lecture">ASP S08 Configuration</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">4</td>
+                    <td class="col-question">الـ DbContextOptions بتتبني فين وإزاي؟</td>
+                    <td class="col-answer">
+                        تُبنى في طبقة الـ Infrastructure عبر ميثود <span class="badge-code">AddInfrastructure()</span> في ملف <span class="badge-code">DependencyInjection.cs</span> وتُستدعى في <span class="badge-code">Program.cs</span> بواسطة:
+                        <div class="code-snippet">services.AddDbContext&lt;AppDbContext&gt;(options =&gt; {<br/>
+&nbsp;&nbsp;options.UseSqlServer(connectionString, sql =&gt; sql.EnableRetryOnFailure(5));<br/>
+});</div>
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">DependencyInjection.cs</span><br/>
+                        <span class="badge-lecture">ASP S08 DI DbContext</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">5</td>
+                    <td class="col-question">عملت الـ Mapping بأنهي طريقة؟ وريها لي.</td>
+                    <td class="col-answer">
+                        باستخدام <strong class="strong-point">Entity Configuration Classes</strong> منفصلة تطبق <span class="badge-code">IEntityTypeConfiguration&lt;T&gt;</span> وتعتمد على <strong class="strong-point">Fluent API</strong>.<br/>
+                        موجودة داخل المجلد: <span class="badge-code">FixNGo.Infrastructure/Persistence/Configurations/</span><br/>
+                        (مثل: <span class="badge-code">ServiceCenterConfiguration.cs</span>, <span class="badge-code">BookingConfiguration.cs</span>)، ويتم استدعاؤها في الـ DbContext عبر السطر:
+                        <div class="code-snippet">modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);</div>
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">Configurations/</span><br/>
+                        <span class="badge-lecture">EF S03 Fluent API</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">6</td>
+                    <td class="col-question">الكويريز والعمليات بتكتبها فين؟</td>
+                    <td class="col-answer">
+                        تُكتب داخل طبقة التطبيق <strong class="strong-point"><span class="badge-code">FixNGo.Application</span></strong> داخل الـ Services (مثل <span class="badge-code">ProviderService.cs</span>) وعبر واجهة <span class="badge-code">IAppDbContext</span>.<br/>
+                        الـ Controller لا يكتب Raw SQL ولا يستعلم مباشرة بل يطلب من الخدمة تجهيز البيانات، مما يمنع تكرار الكود ويسهل إجراء اختبارات الوحدة (Unit Testing).
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">ProviderService.cs</span><br/>
+                        <span class="badge-lecture">ASP S08 Service Layer</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">7</td>
+                    <td class="col-question">يعني إيه Repository، وليه استخدمته؟</td>
+                    <td class="col-answer">
+                        الـ <strong class="strong-point">Repository</strong> هو نمط تصميمي (Design Pattern) يعمل كوسيط بين طبقة الأعمال (Business) وطبقة الوصول للبيانات (Data Access).<br/>
+                        <strong class="strong-point">ليه استخدمناه:</strong> لإخفاء تفاصيل الكويريز ومحرك قاعدة البيانات عن الـ Controllers، بحيث لو استبدلنا SQL Server بأي داتابيز أخرى لا يتأثر أي سطر في منطق العمل، ولتمكين عمل Mocking بسهولة في اختبارات الوحدة.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">IAppDbContext.cs</span><br/>
+                        <span class="badge-lecture">ASP S08 Repository Pattern</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">8</td>
+                    <td class="col-question">افتح أي Repository: إيه اللي المفروض يكون فيه؟</td>
+                    <td class="col-answer">
+                        يحتوي على واجهة (Interface) وكلاس تنفيذي يضم:
+                        <ul class="answer-list">
+                            <li>عمليات القراءة الأساسية: <span class="badge-code">GetByIdAsync(id)</span>, <span class="badge-code">GetAllAsync()</span>.</li>
+                            <li>عمليات التعديل والحفظ: <span class="badge-code">AddAsync(entity)</span>, <span class="badge-code">Update(entity)</span>, <span class="badge-code">Delete(entity)</span>.</li>
+                            <li>دوال متخصصة للبزنس: مثل <span class="badge-code">GetActiveRequestByProviderAsync()</span>.</li>
+                        </ul>
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">IProviderService.cs</span><br/>
+                        <span class="badge-lecture">ASP S08 Repositories</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">9</td>
+                    <td class="col-question">ليه الـ Repository بياخد الـ DbContext في الـ Constructor بدل ما يعمل new؟</td>
+                    <td class="col-answer">
+                        تطبيقاً لمبدأ <strong class="strong-point">Dependency Injection (Inversion of Control)</strong>؛<br/>
+                        لو عمل <span class="badge-code">new</span> سينشئ اتصالاً جديداً مستقلاً بالداتابيز في كل مرة مما يستهلك موارد السيرفر، بينما أخذُه عبر الـ Constructor يضمن أن الـ DI Container يوفر نفس كائن الـ DbContext المشترك (Scoped Lifetime) لكافة الخدمات داخل نفس الـ Request ويقوم بإغلاقه في النهاية بأمان.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">ProviderService.cs:Constructor</span><br/>
+                        <span class="badge-lecture">ASP S08, EF S04 DI</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">10</td>
+                    <td class="col-question">إزاي عملت Inject للـ Repository جوه الـ Controller أو الـ Service؟</td>
+                    <td class="col-answer">
+                        بخطوتين أساسيتين:
+                        1. <strong class="strong-point">التسجيل في <span class="badge-code">Program.cs</span>:</strong> عبر <span class="badge-code">builder.Services.AddScoped&lt;IProviderService, ProviderService&gt;();</span><br/>
+                        2. <strong class="strong-point">الاستقبال في الـ Constructor:</strong> داخل <span class="badge-code">ProviderController.cs</span>:
+                        <div class="code-snippet">public ProviderController(IProviderService providerService) {<br/>
+&nbsp;&nbsp;_providerService = providerService;<br/>
+}</div>
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">ProviderController.cs</span><br/>
+                        <span class="badge-code">Program.cs</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">11</td>
+                    <td class="col-question">وريني الـ Navigation Properties اللي بتمثل علاقة بين جدولين عندك.</td>
+                    <td class="col-answer">
+                        علاقة <strong class="strong-point">One-to-Many</strong> بين مركز الصيانة والخدمات المتاحة:<br/>
+                        - في كلاس <span class="badge-code">ServiceCenter.cs</span>:
+                        <div class="code-snippet">public virtual ICollection&lt;Service&gt; Services { get; set; } = new List&lt;Service&gt;();</div>
+                        - وفي كلاس <span class="badge-code">Service.cs</span>:
+                        <div class="code-snippet">public int ServiceCenterId { get; set; } // Foreign Key<br/>
+public virtual ServiceCenter ServiceCenter { get; set; } = null!; // Reference Nav</div>
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">ServiceCenter.cs</span><br/>
+                        <span class="badge-code">Service.cs</span><br/>
+                        <span class="badge-lecture">EF S04 Relationships</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">12</td>
+                    <td class="col-question">افتح آخر Migration: فيها إيه، وبتقولك إيه عن الداتابيز؟</td>
+                    <td class="col-answer">
+                        ملفات الـ Migration في <span class="badge-code">FixNGo.Infrastructure/Persistence/Migrations/</span> تحتوي على:<br/>
+                        - ميثود <span class="badge-code">Up()</span>: توضح إنشاء الجداول الجديدة (مثل <span class="badge-code">CreateTable ProviderProfiles</span>)، وأنواع الأعمدة، وتعيين الـ Foreign Keys والـ Indexes.<br/>
+                        - ميثود <span class="badge-code">Down()</span>: تحتوي على أوامر التراجع (<span class="badge-code">DropTable</span>) في حال أردنا التراجع عن التعديل.<br/>
+                        - وتقول لنا أن الداتابيز تطبق قيود الـ Referential Integrity وتمنع المسح التتابعي غير المقصود عبر <span class="badge-code">DeleteBehavior.Restrict</span>.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">Migrations/</span><br/>
+                        <span class="badge-lecture">EF S03 Migrations</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section-block">
+        <div class="section-header">
+            <span>3. الـ Request ودورة حياة الـ MVC (MVC Request Life Cycle &amp; Execution)</span>
+            <span class="section-tag">20 سؤال وإجابة نموذجية</span>
+        </div>
+
+        <div class="questions-summary">
+            <h4>قائمة الأسئلة السريعة:</h4>
+            <ol>
+                <li>وريني Request نوعه GET، هندلته إزاي؟</li>
+                <li>وريني Request نوعه POST، هندلته إزاي؟</li>
+                <li>ليه بنحط [HttpPost] فوق الـ Action؟</li>
+                <li>ليه بنحط [ValidateAntiForgeryToken] فوق الـ Action؟</li>
+                <li>الداتا اللي في الفورم وصلت للـ Action إزاي؟ والـ name attribute لازم يبقى إيه؟</li>
+                <li>وريني الـ Validation في الـ POST Action: عملته بإيه؟</li>
+                <li>بتبعت الداتا بين الـ Action والـ View بالـ Domain Model ولا بحاجة تانية؟ ويعني إيه ViewModel أو DTO؟</li>
+                <li>وريني الـ Mapping بين الـ Domain Model والـ ViewModel.</li>
+                <li>وريني الـ Cycle بتاعة الـ Add أو الـ Update.</li>
+                <li>عملت الـ Update إزاي: بتعدل القيم بإيدك على الكائن القديم، ولا بـ ()Update؟</li>
+                <li>رسالة «تم الحفظ» بتظهر بعد الـ Redirect إزاي؟</li>
+                <li>وريني الـ Client-side Validation، عملته إزاي؟</li>
+                <li>افتح Query فيها Include: احتاجتها ليه؟ ومن غيرها EF بيجيب الـ Related Entities لوحده؟</li>
+                <li>الـ Method اللي بتجيب منها الداتا للـ Pagination بترجع IQueryable ولا IEnumerable؟ ولو كانت بترجع IEnumerable، الـ Skip والـ Take هيتنفذوا فين؟</li>
+                <li>إمتى ممكن تحتاج AsEnumerable؟ وتحطها فين في الـ Query؟</li>
+                <li>وريني الـ Pagination: عملته بأنهي Methods؟ وليه؟</li>
+                <li>يعني إيه Middleware؟ وريني اللي في Program.cs وكل واحدة بتعمل إيه.</li>
+                <li>ليه ترتيب الـ Middlewares مهم؟</li>
+                <li>وريني الـ Routing: الـ URL ده بيوصل لأنهي Controller وأنهي Action؟</li>
+                <li>يعني إيه {id?}؟ وإيه صفحة البداية في مشروعك؟</li>
+            </ol>
+        </div>
+
+        <div class="evidence-heading">الدليل النموذجي والإجابات التفصيلية من واقع كود ومواصفات FixNGo:</div>
+
+        <table class="qna-table">
+            <thead>
+                <tr>
+                    <th class="col-id">#</th>
+                    <th class="col-question">السؤال</th>
+                    <th class="col-answer">الإجابة النموذجية والدليل من كود وتطبيق FixNGo</th>
+                    <th class="col-source">المرجع من المشروع</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="col-id">1</td>
+                    <td class="col-question">وريني Request نوعه GET، هندلته إزاي؟</td>
+                    <td class="col-answer">
+                        في <span class="badge-code">ServiceCentersController.cs</span> ميثود <span class="badge-code">Index</span>:<br/>
+                        تستقبل بارامترات الاستعلام <span class="badge-code">(string? search, string? city, string? sortOrder, int pageNumber)</span>، تجلب المراكز من قاعدة البيانات، تطبق التصفية والترتيب والـ Pagination، ثم تحولها لـ <span class="badge-code">ServiceCenterIndexViewModel</span> وترجعها عبر <span class="badge-code">return View(viewModel);</span>.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">ServiceCentersController</span><br/>
+                        <span class="badge-lecture">ASP S02, S05 Controller</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">2</td>
+                    <td class="col-question">وريني Request نوعه POST، هندلته إزاي؟</td>
+                    <td class="col-answer">
+                        في <span class="badge-code">BookingsController.cs</span> ميثود <span class="badge-code">Create(Booking booking)</span>:<br/>
+                        تستقبل بيانات الحجز عبر الـ Model Binding من الفورم، تفحص <span class="badge-code">ModelState.IsValid</span> والقواعد الإضافية، وإذا كانت صالحة تحفظ الكيان وتضع رسالة نجاح في <span class="badge-code">TempData</span> ثم ترجع <span class="badge-code">RedirectToAction(nameof(Dashboard))</span>. وإذا كانت غير صالحة تعيد نفس الـ View بالبيانات لإظهار أخطاء التحقق.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">BookingsController.cs</span><br/>
+                        <span class="badge-lecture">ASP S03, S05 Post Action</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">3</td>
+                    <td class="col-question">ليه بنحط [HttpPost] فوق الـ Action؟</td>
+                    <td class="col-answer">
+                        لتقييد الأكشن بحيث لا تستجيب إلا لطلبات HTTP POST فقط؛ لمنع تنفيذ عمليات تغيير الحالة والحفظ من خلال روابط GET المباشرة (مثل وضع الرابط في المتصفح أو عناكب البحث Web Crawlers)، وإذا حاول أحد استدعاءها بـ GET يُرجع السيرفر كود <span class="badge-code">405 Method Not Allowed</span>.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">HTTP Verbs</span><br/>
+                        <span class="badge-lecture">ASP S03</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">4</td>
+                    <td class="col-question">ليه بنحط [ValidateAntiForgeryToken] فوق الـ Action؟</td>
+                    <td class="col-answer">
+                        للحماية من هجمات <strong class="strong-point">CSRF (Cross-Site Request Forgery)</strong>؛ حيث يتأكد السيرفر من أن الـ Request قادم من الفورم الشرعي الخاص بالموقع والذي يحتوي على التوكن المشفر المخفي، وليس من موقع خارجي خبيث يستغل جلسة المستخدم المسجلة.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">Security Headers</span><br/>
+                        <span class="badge-lecture">ASP S08 Security</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">5</td>
+                    <td class="col-question">الداتا اللي في الفورم وصلت للـ Action إزاي؟ والـ name attribute لازم يبقى إيه؟</td>
+                    <td class="col-answer">
+                        وصلت عبر آلية <strong class="strong-point">Model Binding</strong> التي تقرأ البيانات من جسم الطلب (Request Body).<br/>
+                        ويجب أن يطابق الـ <span class="badge-code">name</span> الخاص بحقل الـ HTML تماماً اسم الخاصية في الـ C# ViewModel أو اسم الـ Action Parameter. وهذا بالضبط ما يولده الـ Tag Helper <span class="badge-code">asp-for="PropertyName"</span> تلقائياً.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">asp-for Tag Helper</span><br/>
+                        <span class="badge-lecture">ASP S03, S06 Binding</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">6</td>
+                    <td class="col-question">وريني الـ Validation في الـ POST Action: عملته بإيه؟</td>
+                    <td class="col-answer">
+                        طبقنا <strong class="strong-point">التحقق ثنائي الطبقات (Dual-Layer Validation)</strong>:
+                        1. <strong class="strong-point">Data Annotations:</strong> على كلاسات الـ ViewModels والـ DTOs (<span class="badge-code">[Required]</span>, <span class="badge-code">[Phone]</span>, <span class="badge-code">[Range]</span>).<br/>
+                        2. <strong class="strong-point">FluentValidation (بونص المشروع):</strong> في ملف <span class="badge-code">Validators.cs</span> للمنطق المعقد.<br/>
+                        3. وفي الـ Action نتحقق عبر: <span class="badge-code">if (!ModelState.IsValid) return View(model);</span> وتُعرض الأخطاء عبر <span class="badge-code">asp-validation-for</span>.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">Validators.cs</span><br/>
+                        <span class="badge-code">TowProviderViewModels.cs</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">7</td>
+                    <td class="col-question">بتبعت الداتا بين الـ Action والـ View بالـ Domain Model ولا بحاجة تانية؟ ويعني إيه ViewModel أو DTO؟</td>
+                    <td class="col-answer">
+                        نبعتها حصراً بواسطة <strong class="strong-point">ViewModels / DTOs</strong> وليس بالـ Domain Entity مباشرة.<br/>
+                        <strong class="strong-point">الـ ViewModel / DTO:</strong> هو كلاس مخصص ومفصل بدقة على احتياج شاشة العرض فقط؛ يجمع بيانات من عدة جداول (مثل اسم المركز واسم العميل واسم الخدمة في كائن حجز واحد)، ويخفي تفاصيل الداتابيز الحساسة، ويحمي من هجمات الـ Over-Posting.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">ServiceCenterIndexViewModel</span><br/>
+                        <span class="badge-lecture">ASP S03, S06 DTO</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">8</td>
+                    <td class="col-question">وريني الـ Mapping بين الـ Domain Model والـ ViewModel.</td>
+                    <td class="col-answer">
+                        باستخدام مكتبة <strong class="strong-point">AutoMapper</strong> في ملف <span class="badge-code">FixNGo.Application/Common/Mappings/MappingProfile.cs</span>؛ حيث قمنا بإنشاء ملف تعريف يربط:
+                        <div class="code-snippet">CreateMap&lt;ServiceCenter, ServiceCenterDto&gt;()<br/>
+&nbsp;&nbsp;.ForMember(dest =&gt; dest.IsVerified, opt =&gt; opt.MapFrom(src =&gt; src.VerificationStatus == VerificationStatus.Verified));</div>
+                        وفي المتحكم نكتب ببساطة: <span class="badge-code">var dtos = _mapper.Map&lt;List&lt;ServiceCenterDto&gt;&gt;(items);</span>.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">MappingProfile.cs</span><br/>
+                        <span class="badge-lecture">AutoMapper Integration</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">9</td>
+                    <td class="col-question">وريني الـ Cycle بتاعة الـ Add أو الـ Update.</td>
+                    <td class="col-answer">
+                        <ul class="answer-list">
+                            <li><strong class="strong-point">دورة الـ Add:</strong> استدعاء GET لفتح فورم فارغ ➔ تعبئة الحقول وإرسال POST ➔ تحقق السيرفر ➔ <span class="badge-code">_context.Add()</span> ➔ <span class="badge-code">SaveChangesAsync()</span> ➔ <span class="badge-code">RedirectToAction</span>.</li>
+                            <li><strong class="strong-point">دورة الـ Update:</strong> استدعاء GET برقم المعرف <span class="badge-code">id</span> لتحميل البيانات الحالية في الفورم ➔ إرسال POST يحتوي على الـ Id المخفي ➔ جلب الكائن الأصلي ➔ تعديل الخصائص فقط ➔ حفظ ➔ توجيه.</li>
+                        </ul>
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">ServiceCentersController:Profile</span><br/>
+                        <span class="badge-lecture">ASP S03, S04 CRUD</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">10</td>
+                    <td class="col-question">عملت الـ Update إزاي: بتعدل القيم بإيدك على الكائن القديم، ولا بـ ()Update؟</td>
+                    <td class="col-answer">
+                        نقوم <strong class="strong-point">بتعديل القيم يدوياً على الكائن الأصلي المجلوب من الـ DbContext</strong> (Manual Assignment)؛<br/>
+                        السبب: ميثود <span class="badge-code">Update(entity)</span> تجعل كل حقول الجدول في حالة <span class="badge-code">Modified</span>، فلو الفورم لا يحتوي على كلمة السر أو تاريخ الإنشاء سيتم مسحها أو تصفيرها في الداتابيز! بينما التعديل اليدوي على الكائن المجلوب يحدث فقط الحقول التي تغيرت فعلياً في كويري الـ SQL.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">ServiceCentersController.cs:322</span><br/>
+                        <span class="badge-lecture">EF S04, ASP S04 Entity State</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">11</td>
+                    <td class="col-question">رسالة «تم الحفظ» بتظهر بعد الـ Redirect إزاي؟</td>
+                    <td class="col-answer">
+                        عبر تخزينها في <strong class="strong-point"><span class="badge-code">TempData["Success"]</span></strong> قبل استدعاء الـ <span class="badge-code">RedirectToAction</span>؛<br/>
+                        لأن <span class="badge-code">TempData</span> تعتمد على جلسة السيرفر أو الكوكي، فتبقى حية للطلب التالي (الذي ينتج عن التحويل)، بينما <span class="badge-code">ViewBag</span> تموت فور انتهاء الطلب الحالي ولا تعبر الـ Redirect أبداً.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">BookingsController.cs:94</span><br/>
+                        <span class="badge-lecture">ASP S03 TempData</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">12</td>
+                    <td class="col-question">وريني الـ Client-side Validation، عملته إزاي؟</td>
+                    <td class="col-answer">
+                        عبر إنشاء الملف الجزئي <span class="badge-code">_ValidationScriptsPartial.cshtml</span> واستدعائه في أسفل صفحات النماذج داخل <span class="badge-code">@section Scripts</span>.<br/>
+                        الملف يربط مكتبات: <span class="badge-code">jquery.js</span> ➔ <span class="badge-code">jquery.validate.js</span> ➔ <span class="badge-code">jquery.validate.unobtrusive.js</span>. وتقوم المكتبة الأخيرة بقراءة الـ <span class="badge-code">data-val-*</span> المولدة من الـ Tag Helpers وفحص الحقول في المتصفح قبل إرسال الطلب.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">_ValidationScriptsPartial.cshtml</span><br/>
+                        <span class="badge-lecture">ASP S06 Unobtrusive</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">13</td>
+                    <td class="col-question">افتح Query فيها Include: احتاجتها ليه؟ ومن غيرها EF بيجيب الـ Related Entities لوحده؟</td>
+                    <td class="col-answer">
+                        في <span class="badge-code">BookingsController.cs</span>:<br/>
+                        <div class="code-snippet">_context.Bookings.Include(b =&gt; b.ServiceCenter).Include(b =&gt; b.Service).Include(b =&gt; b.Customer)</div>
+                        <strong class="strong-point">احتاجناها ليه:</strong> لعرض اسم المركز واسم الخدمة وبيانات العميل في لوحة الحجوزات.<br/>
+                        <strong class="strong-point">هل EF يجيبها لوحده؟</strong> لا! EF Core يطبق مبدأ الأداء ولا يقوم بعمل Eager Loading تلقائياً، وبدون <span class="badge-code">Include</span> ستكون الخصائص <span class="badge-code">null</span> وسينتج عنها <span class="badge-code">NullReferenceException</span>.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">BookingsController.cs:122</span><br/>
+                        <span class="badge-lecture">ASP S02 Eager Loading</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">14</td>
+                    <td class="col-question">الـ Method اللي بتجيب منها الداتا للـ Pagination بترجع IQueryable ولا IEnumerable؟ ولو كانت بترجع IEnumerable، الـ Skip والـ Take هيتنفذوا فين؟</td>
+                    <td class="col-answer">
+                        ترجع <strong class="strong-point"><span class="badge-code">IQueryable</span></strong>؛<br/>
+                        لأن <span class="badge-code">IQueryable</span> تعني أن الاستعلام ما زال قيد البناء، فيتم ترجمة <span class="badge-code">Skip</span> و <span class="badge-code">Take</span> إلى كود SQL (<span class="badge-code">OFFSET ... ROWS FETCH NEXT</span>) ويُنفذ في سيرفر الداتابيز.<br/>
+                        لو كانت ترجع <span class="badge-code">IEnumerable</span>، فسيتم جلب كل سجلات الجدول للذاكرة أولاً ثم تطبيق الـ Skip والـ Take داخل الرام، مما يسبب كارثة في الأداء مع كبر حجم البيانات.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">ServiceCentersController.cs</span><br/>
+                        <span class="badge-lecture">EF S01 IQueryable vs IEnumerable</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">15</td>
+                    <td class="col-question">إمتى ممكن تحتاج AsEnumerable؟ وتحطها فين في الـ Query؟</td>
+                    <td class="col-answer">
+                        نحتاجها فقط عندما نريد تنفيذ دالة أو ميثود C# مخصصة لا يستطيع محرك SQL Server ترجمتها (Client Evaluation).<br/>
+                        <strong class="strong-point">مكانها:</strong> توضع دائماً في نهاية الاستعلام بعد كل عمليات الـ <span class="badge-code">Where</span> والـ <span class="badge-code">OrderBy</span> والـ <span class="badge-code">Skip/Take</span>، لضمان أن ما يصل للذاكرة هو فقط السجلات المصفاة وليس كامل الجدول.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-lecture">EF S01, S02 Client Evaluation</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">16</td>
+                    <td class="col-question">وريني الـ Pagination: عملته بأنهي Methods؟ وليه؟</td>
+                    <td class="col-answer">
+                        باستخدام ميثودز <strong class="strong-point"><span class="badge-code">Skip()</span> و <span class="badge-code">Take()</span></strong> مسبوقة بـ <strong class="strong-point"><span class="badge-code">OrderBy()</span></strong> وبجانبها <span class="badge-code">Count()</span>:<br/>
+                        <div class="code-snippet">var items = query.OrderBy(c =&gt; c.Name).Skip((page - 1) * pageSize).Take(pageSize).ToList();</div>
+                        <strong class="strong-point">السبب:</strong> <span class="badge-code">OrderBy</span> يضمن ثبات ترتيب النتائج، و <span class="badge-code">Count</span> لحساب عدد الصفحات الإجمالية، و <span class="badge-code">Skip/Take</span> لتحديد نقطة البداية وعدد عناصر الصفحة.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">ServiceCentersController.cs:78</span><br/>
+                        <span class="badge-lecture">EF S02 Pagination</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">17</td>
+                    <td class="col-question">يعني إيه Middleware؟ وريني اللي في Program.cs وكل واحدة بتعمل إيه.</td>
+                    <td class="col-answer">
+                        الـ <strong class="strong-point">Middleware</strong> هو حلقة في مسار الـ Request Pipeline تستقبل الطلب وتنفذ مهمة محددة ثم تسلمه للتالي:<br/>
+                        - <span class="badge-code">UseExceptionHandler</span>: اصطياد الأخطاء غير المتوقعة وعرض صفحة خطأ احترافية.<br/>
+                        - <span class="badge-code">UseStaticFiles</span>: خدمة ملفات css و js والصور من مجلد wwwroot.<br/>
+                        - <span class="badge-code">UseRouting</span>: قراءة الرابط وتحديد الـ Controller/Action المستهدف.<br/>
+                        - <span class="badge-code">UseAuthentication</span>: التحقق من هوية المستخدم المسجل.<br/>
+                        - <span class="badge-code">UseAuthorization</span>: فحص صلاحيات المستخدم على المورد المطلوب.<br/>
+                        - <span class="badge-code">MapControllerRoute</span>: توجيه الطلب للـ Action المختصة.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">Program.cs</span><br/>
+                        <span class="badge-lecture">ASP S06, S08 Pipeline</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">18</td>
+                    <td class="col-question">ليه ترتيب الـ Middlewares مهم؟</td>
+                    <td class="col-answer">
+                        لأن الـ Pipeline تعمل بتتابع صارم في مسار الذهاب والإياب؛<br/>
+                        فمثلاً: يجب وضع <span class="badge-code">UseAuthentication</span> قبل <span class="badge-code">UseAuthorization</span> لأن النظام لا يستطيع فحص الصلاحيات لشخص لم يعرف هويته بعد. ويجب وضع <span class="badge-code">UseExceptionHandler</span> في بداية الـ Pipeline حتى يستطيع اصطياد أي خطأ يحدث في أي مرحلة تالية.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">Program.cs:Order</span><br/>
+                        <span class="badge-lecture">ASP S06, S10 Middleware Order</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">19</td>
+                    <td class="col-question">وريني الـ Routing: الـ URL ده بيوصل لأنهي Controller وأنهي Action؟</td>
+                    <td class="col-answer">
+                        معرف في <span class="badge-code">Program.cs</span> عبر نمط الـ Conventional Routing:
+                        <div class="code-snippet">pattern: "{controller=Home}/{action=Index}/{id?}"</div>
+                        رابط مثل: <span class="badge-code">/TowProvider/ActiveTow/101</span> يُفككه الـ Routing Engine إلى: متحكم <span class="badge-code">TowProviderController</span>، أكشن <span class="badge-code">ActiveTow</span>، ويمرر البارامتر <span class="badge-code">id = 101</span>.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">Program.cs:Routing</span><br/>
+                        <span class="badge-lecture">ASP S08 Routing</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">20</td>
+                    <td class="col-question">يعني إيه {id?}؟ وإيه صفحة البداية في مشروعك؟</td>
+                    <td class="col-answer">
+                        - علامة الاستفهام تعني أن البارامتر <strong class="strong-point">اختياري (Optional)</strong>، فيمكن للرابط العمل مع أو بدون id (مثل <span class="badge-code">/ServiceCenters/Index</span>).<br/>
+                        - <strong class="strong-point">صفحة البداية في FixNGo:</strong> هي الصفحة الرئيسية <span class="badge-code">HomeController.Index</span> على المسار <span class="badge-code">/</span>، والتي تعرض واجهة الترحيب ومداخل طوارئ الطرق السريعة ومراكز الصيانة.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">HomeController.cs</span><br/>
+                        <span class="badge-lecture">ASP S08 Routing</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section-block">
+        <div class="section-header">
+            <span>4. جودة الكود المتقدمة وحالات الحدود (Advanced Code Quality &amp; Edge Cases)</span>
+            <span class="section-tag">11 سؤال وإجابة نموذجية</span>
+        </div>
+
+        <div class="questions-summary">
+            <h4>قائمة الأسئلة السريعة:</h4>
+            <ol>
+                <li>لو الـ SQL Server مقفول وفتحت الموقع، اليوزر هيشوف إيه؟ جرب قدامي.</li>
+                <li>ليه الـ Actions بتاعتك async؟ وإيه الفرق لو شلنا await؟</li>
+                <li>افتح الـ Profiler أو الـ Logs: كام Query بتتنفذ لما صفحة القائمة تفتح؟</li>
+                <li>مين بيقفل الاتصال بالداتابيز في مشروعك؟</li>
+                <li>الـ Connection String والـ Secrets اترفعوا على GitHub؟ وريني .gitignore.</li>
+                <li>لو حد كتب ' OR 1=1 -- في البحث، أو &lt;script&gt; في الاسم، إيه اللي هيحصل؟ وليه؟</li>
+                <li>افتح الـ HTML المتولد لأي فورم ووريني الـ AntiForgery Token.</li>
+                <li>لو اتنين حجزوا آخر قطعة في نفس اللحظة، المشروع هيعمل إيه؟</li>
+                <li>يعني إيه Refactoring؟ وإيه معايير الجودة الأربعة؟</li>
+                <li>استخدمت AsNoTracking فين؟ وليه هنا بالذات؟</li>
+                <li>الـ Navigation Property اللي بتمثل الـ Many عندك نوعها إيه: ICollection ولا List ولا IEnumerable؟ ولو غيرتها لـ IEnumerable، إيه اللي مش هتقدر تعمله؟</li>
+            </ol>
+        </div>
+
+        <div class="evidence-heading">الدليل النموذجي والإجابات التفصيلية من واقع كود ومواصفات FixNGo:</div>
+
+        <table class="qna-table">
+            <thead>
+                <tr>
+                    <th class="col-id">#</th>
+                    <th class="col-question">السؤال</th>
+                    <th class="col-answer">الإجابة النموذجية والدليل من كود وتطبيق FixNGo</th>
+                    <th class="col-source">المرجع من المشروع</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="col-id">1</td>
+                    <td class="col-question">لو الـ SQL Server مقفول وفتحت الموقع، اليوزر هيشوف إيه؟ جرب قدامي.</td>
+                    <td class="col-answer">
+                        اليوزر هيشوف <strong class="strong-point">صفحة خطأ ودية واحترافية (Custom Error Page)</strong> تبلغه بوجود عطل مؤقت في الخدمة دون كشف أي معلومات حساسة، ولن يرى إطلاقاً شاشة الـ Stack Trace الصفراء أو الـ Developer Exception Page لأنها معطلة في بيئة الـ Production عبر <span class="badge-code">UseExceptionHandler("/Home/Error")</span>.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">Program.cs:ErrorHandling</span><br/>
+                        <span class="badge-lecture">ASP S06 Exception Handler</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">2</td>
+                    <td class="col-question">ليه الـ Actions بتاعتك async؟ وإيه الفرق لو شلنا await؟</td>
+                    <td class="col-answer">
+                        - لأن عمليات الداتابيز وقراءة السجلات هي عمليات <strong class="strong-point">I/O-Bound</strong>؛ استخدام <span class="badge-code">async/await</span> يجعل الـ Thread غير مقيد وينطلق لخدمة طلبات مستخدمين آخرين أثناء انتظار رد الداتابيز، مما يرفع الـ Scalability ويسمح بتحمل آلاف الطلبات.<br/>
+                        - لو شلنا <span class="badge-code">await</span> واستخدمنا <span class="badge-code">.Result</span> أو <span class="badge-code">.Wait()</span>، فسيحدث <strong class="strong-point">Thread Blocking</strong> وربما يقع السيرفر في <strong class="strong-point">Deadlock</strong> وتنهار الخدمة تحت الضغط.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">ServiceCentersController:async</span><br/>
+                        <span class="badge-lecture">ASP S10 Async Programming</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">3</td>
+                    <td class="col-question">افتح الـ Profiler أو الـ Logs: كام Query بتتنفذ لما صفحة القائمة تفتح؟</td>
+                    <td class="col-answer">
+                        <strong class="strong-point">استعلامان اثنان فقط (2 Queries):</strong><br/>
+                        1. كويري لحساب إجمالي عدد المراكز للترقيم: <span class="badge-code">SELECT COUNT(*) FROM ServiceCenters</span>.<br/>
+                        2. كويري لجلب بيانات الصفحة الحالية مع الخدمات المرتبطة دفعة واحدة بفضل الـ <span class="badge-code">Include</span>: <span class="badge-code">SELECT ... FROM ServiceCenters JOIN Services ... OFFSET 0 ROWS FETCH NEXT 6 ROWS</span>.<br/>
+                        مما يضمن عدم وجود مشكلة الـ N+1 Queries نهائياً.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">SQL Server Profiler / EF Logs</span><br/>
+                        <span class="badge-lecture">EF S04 Query Optimization</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">4</td>
+                    <td class="col-question">مين بيقفل الاتصال بالداتابيز في مشروعك؟</td>
+                    <td class="col-answer">
+                        الـ <strong class="strong-point">Dependency Injection Container الخاص بـ ASP.NET Core</strong>؛<br/>
+                        لأن الـ <span class="badge-code">AppDbContext</span> مسجل كـ <span class="badge-code">Scoped Lifetime</span>، فيقوم الـ Container بعمل <span class="badge-code">Dispose()</span> تلقائي للـ Context وإغلاق اتصال الداتابيز وتحرير الموارد بمجرد اكتمال الـ HTTP Request.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">DI Container Lifecycle</span><br/>
+                        <span class="badge-lecture">EF S04, ASP S08 Disposal</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">5</td>
+                    <td class="col-question">الـ Connection String والـ Secrets اترفعوا على GitHub؟ وريني .gitignore.</td>
+                    <td class="col-answer">
+                        <strong class="strong-point">بالتأكيد لأ!</strong> ملف <span class="badge-code">.gitignore</span> يستثني ملفات الداتابيز المحلية <span class="badge-code">*.db</span> وبيانات الإعدادات الخاصة. وتُدار الأسرار محلياً عبر <span class="badge-code">dotnet user-secrets</span> لضمان عدم تسريب كلمات المرور الخاصة بالإنتاج إلى مستودعات الأكواد العامة.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">.gitignore</span><br/>
+                        <span class="badge-lecture">ASP S08 Secret Manager</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">6</td>
+                    <td class="col-question">لو حد كتب ' OR 1=1 -- في البحث، أو &lt;script&gt; في الاسم، إيه اللي هيحصل؟ وليه؟</td>
+                    <td class="col-answer">
+                        - <strong class="strong-point">في محاولة SQL Injection:</strong> لن يحدث اختراق، بل سيبحث السيستم عن النص الحرفي لأن EF Core يستخدم <span class="badge-code">Parameterized Queries</span> مشفرة تفصل الأوامر عن البيانات.<br/>
+                        - <strong class="strong-point">في محاولة XSS Script:</strong> لن يُنفذ الكود الخبيث في المتصفح لأن محرك Razor في الـ View يقوم بعمل <strong class="strong-point">HTML Encoding</strong> تلقائي لكل النصوص المعروضة ما لم نستخدم صراحة <span class="badge-code">Html.Raw</span>.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-lecture">EF S01, ASP S06 Security</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">7</td>
+                    <td class="col-question">افتح الـ HTML المتولد لأي فورم ووريني الـ AntiForgery Token.</td>
+                    <td class="col-answer">
+                        في أي نموذج (مثل فورم حجز الموعد <span class="badge-code">Views/Bookings/Create.cshtml</span>)، يُنشئ الـ Form Tag Helper تلقائياً حقلاً مخفياً يحمل الاسم:
+                        <div class="code-snippet">&lt;input type="hidden" name="__RequestVerificationToken" value="CfDJ8..." /&gt;</div>
+                        ويتم التحقق منه تلقائياً أو عبر <span class="badge-code">[ValidateAntiForgeryToken]</span>.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">Bookings/Create.cshtml</span><br/>
+                        <span class="badge-lecture">CSRF Prevention</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">8</td>
+                    <td class="col-question">لو اتنين حجزوا آخر قطعة في نفس اللحظة، المشروع هيعمل إيه؟</td>
+                    <td class="col-answer">
+                        تحدث حالة <strong class="strong-point">Race Condition</strong>؛ ونتعامل معها من خلال:
+                        1. <strong class="strong-point">Database Transactions:</strong> لفحص توفر الخانة وحجزها كعملية ذرية غير قابلة للتجزئة (Atomic Unit).<br/>
+                        2. <strong class="strong-point">Optimistic Concurrency:</strong> باستخدام عمود <span class="badge-code">RowVersion / ConcurrencyCheck</span>؛ فالطرف الأول يحجز بنجاح، بينما يرمي السيستم للطرف الثاني استثناء <span class="badge-code">DbUpdateConcurrencyException</span> ويخبره بأن الموعد تم حجزه تواً.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-lecture">EF S04 Concurrency &amp; Transactions</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">9</td>
+                    <td class="col-question">يعني إيه Refactoring؟ وإيه معايير الجودة الأربعة؟</td>
+                    <td class="col-answer">
+                        الـ <strong class="strong-point">Refactoring</strong> هو تحسين وتطهير البنية الداخلية للكود دون تغيير سلوكه ووظائفه الخارجية الملموسة للمستخدم.<br/>
+                        <strong class="strong-point">معايير الجودة الأربعة (Clean Code Metrics):</strong><br/>
+                        1. <strong class="strong-point">Readable:</strong> كود واضح ومفهوم يسهل قراءته بالعين المجردة.<br/>
+                        2. <strong class="strong-point">Maintainable:</strong> يسهل صيانته وإصلاحه بأقل مجهود وبدون كسر أماكن أخرى.<br/>
+                        3. <strong class="strong-point">Testable:</strong> مفصول التبعيات وجاهز للـ Unit Testing.<br/>
+                        4. <strong class="strong-point">Scalable:</strong> مصمم بطريقة تتحمل نمو البيانات والمستخدمين.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-lecture">ASP S08 Software Quality</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">10</td>
+                    <td class="col-question">استخدمت AsNoTracking فين؟ وليه هنا بالذات؟</td>
+                    <td class="col-answer">
+                        استخدمناها في دوال القراءة والاستعراض المجردة في <span class="badge-code">ProviderService.cs</span> (مثل جلب سجل الطلبات <span class="badge-code">GetHistoryAsync</span> وتفاصيل الطلب).<br/>
+                        <strong class="strong-point">ليه هنا بالذات:</strong> لأن الكائنات المعروضة في شاشات الاستعراض لن نقوم بتعديلها أو حفظها، فإلغاء التتبع يوفر على السيرفر عمل Snapshots للكيانات في الذاكرة مما يقلل الضغط على الرام ويسرع الاستعلام بشكل ملحوظ.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">ProviderService.cs</span><br/>
+                        <span class="badge-lecture">ASP S04, EF S04 AsNoTracking</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">11</td>
+                    <td class="col-question">الـ Navigation Property اللي بتمثل الـ Many عندك نوعها إيه: ICollection ولا List ولا IEnumerable؟ ولو غيرتها لـ IEnumerable، إيه اللي مش هتقدر تعمله؟</td>
+                    <td class="col-answer">
+                        نوعها <strong class="strong-point"><span class="badge-code">ICollection&lt;T&gt;</span></strong>.<br/>
+                        <strong class="strong-point">لو غيرناها لـ IEnumerable:</strong> لن نستطيع إضافة كيانات جديدة للجدول المرتبط مباشرة عبر خاصية التنقل (مثل <span class="badge-code">center.Services.Add(newService)</span>) أو حذف عناصر منها (<span class="badge-code">Remove</span>)، لأن <span class="badge-code">IEnumerable</span> واجهة للقراءة فقط (Read-only iteration) ولا تدعم التعديل.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">ServiceCenter.cs</span><br/>
+                        <span class="badge-lecture">EF S04, ASP S02 Collections</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section-block">
+        <div class="section-header">
+            <span>5. المعمارية وحقن التبعيات (Clean Architecture &amp; Dependency Injection)</span>
+            <span class="section-tag">15 سؤال وإجابة نموذجية</span>
+        </div>
+
+        <div class="questions-summary">
+            <h4>قائمة الأسئلة السريعة:</h4>
+            <ol>
+                <li>وريني الـ Layers اللي في الـ Solution. كل Layer مسئولة عن إيه؟</li>
+                <li>مين عامل Reference لمين؟ وليه الاتجاه ده؟</li>
+                <li>الـ Controller بيكلم الـ DbContext على طول؟ ولو لأ، بيكلم مين؟</li>
+                <li>عندك Service Layer؟ إيه الفرق بينها وبين الـ Repository؟</li>
+                <li>الـ Business Rule مكانها في أنهي Layer؟ وليه؟</li>
+                <li>الـ Entities والـ ViewModels موجودين في أنهي Layer؟</li>
+                <li>لو هنغير SQL Server بـ PostgreSQL، هتعدل في أنهي ملفات؟</li>
+                <li>لو هنعمل Mobile App بنفس الـ Business، إيه اللي هنعيد استخدامه وإيه اللي هنكتبه من جديد؟</li>
+                <li>يعني إيه Dependency Injection؟ وإيه علاقته بالـ IoC؟</li>
+                <li>وريني الـ Services المتسجلة في Program.cs. كل سطر بيسجل إيه؟</li>
+                <li>ليه بنسجل Interface قصاد Class، مش الـ Class لوحده؟</li>
+                <li>اخترت Scoped ليه؟ وإمتى نستخدم Singleton أو Transient؟</li>
+                <li>الـ AddDbContext بيسجل الـ Context بأنهي Lifetime؟ وليه؟</li>
+                <li>لو Service محتاجة Service تانية في الـ Constructor، مين بيوفرهالها؟</li>
+                <li>لو مسحت سطر تسجيل Service من Program.cs، إيه اللي هيحصل؟</li>
+            </ol>
+        </div>
+
+        <div class="evidence-heading">الدليل النموذجي والإجابات التفصيلية من واقع كود ومواصفات FixNGo:</div>
+
+        <table class="qna-table">
+            <thead>
+                <tr>
+                    <th class="col-id">#</th>
+                    <th class="col-question">السؤال</th>
+                    <th class="col-answer">الإجابة النموذجية والدليل من كود وتطبيق FixNGo</th>
+                    <th class="col-source">المرجع من المشروع</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="col-id">1</td>
+                    <td class="col-question">وريني الـ Layers اللي في الـ Solution. كل Layer مسئولة عن إيه؟</td>
+                    <td class="col-answer">
+                        المشروع مبني بمعمارية <strong class="strong-point">Clean / Onion Architecture</strong> مكونة من 5 مشاريع:
+                        <ul class="answer-list">
+                            <li><strong class="strong-point">FixNGo.Domain:</strong> قلب النظام، يحتوي الكيانات والـ Enums الخالصة المستقلة عن أي إطار خارجي.</li>
+                            <li><strong class="strong-point">FixNGo.Application:</strong> حالات الاستخدام (Use Cases)، الـ DTOs، المابينج بالـ AutoMapper، والفاليديشن.</li>
+                            <li><strong class="strong-point">FixNGo.Infrastructure:</strong> الاتصال بالداتابيز عبر EF Core، تطبيق الـ Identity، والخدمات الخارجية.</li>
+                            <li><strong class="strong-point">FixNGo.Web:</strong> واجهة الـ Presentation (Controllers, Views, ViewModels, Routing).</li>
+                            <li><strong class="strong-point">FixNGo.UnitTests:</strong> اختبارات الوحدة الآلية لضمان جودة الكود.</li>
+                        </ul>
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-ref">Solution Explorer</span><br/>
+                        <span class="badge-lecture">ASP S03, S08 Clean Architecture</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">2</td>
+                    <td class="col-question">مين عامل Reference لمين؟ وليه الاتجاه ده؟</td>
+                    <td class="col-answer">
+                        <strong class="strong-point">الاتجاه دائماً للداخل نحو الـ Domain:</strong><br/>
+                        - <span class="badge-code">Application</span> يرى فقط <span class="badge-code">Domain</span>.<br/>
+                        - <span class="badge-code">Infrastructure</span> يرى <span class="badge-code">Application</span> و <span class="badge-code">Domain</span>.<br/>
+                        - <span class="badge-code">Web</span> يرى <span class="badge-code">Infrastructure</span> و <span class="badge-code">Application</span>.<br/>
+                        <strong class="strong-point">السبب:</strong> تطبيق قاعدة التبعية (Dependency Inversion)؛ لكي يظل منطق البزنس في الـ Domain والـ Application مستقلاً تماماً عن شكل الشاشات ونوع محرك الداتابيز.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">Project References</span><br/>
+                        <span class="badge-lecture">ASP S08 Dependency Rules</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">3</td>
+                    <td class="col-question">الـ Controller بيكلم الـ DbContext على طول؟ ولو لأ، بيكلم مين؟</td>
+                    <td class="col-answer">
+                        في المعمارية السليمة، <strong class="strong-point">الـ Controller لا يكلم الـ DbContext مباشرة</strong> بل يكلم طبقة الخدمات من خلال واجهة مثل <span class="badge-code">IProviderService</span>؛<br/>
+                        الـ Controller وظيفته استقبال الطلب، التحقق من المدخلات، ومناداة الخدمة المناسبة وعرض النتيجة في الـ View دون الغرق في تفاصيل الداتابيز.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">ProviderController.cs</span><br/>
+                        <span class="badge-lecture">ASP S03, S08 Separation</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">4</td>
+                    <td class="col-question">عندك Service Layer؟ إيه الفرق بينها وبين الـ Repository؟</td>
+                    <td class="col-answer">
+                        نعم، طبقة <span class="badge-code">FixNGo.Application/Features</span> تمثل الـ Service Layer.<br/>
+                        <strong class="strong-point">الفرق:</strong><br/>
+                        - <strong class="strong-point">الـ Repository:</strong> يركز حصراً على مهام الـ Data Access والـ CRUD الأساسية.<br/>
+                        - <strong class="strong-point">الـ Service:</strong> تحتوي على منطق البزنس، حساب التكاليف، إرسال الإشعارات، التحقق من القواعد المعقدة، والربط بين أكثر من Repository.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">IProviderService.cs</span><br/>
+                        <span class="badge-lecture">ASP S08 Services vs Repos</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">5</td>
+                    <td class="col-question">الـ Business Rule مكانها في أنهي Layer؟ وليه؟</td>
+                    <td class="col-answer">
+                        مكانها في <strong class="strong-point"><span class="badge-code">FixNGo.Domain</span></strong> (عبر الـ Domain Invariants) وفي <strong class="strong-point"><span class="badge-code">FixNGo.Application</span></strong> (عبر الـ Fluent Validators والـ Use Cases)؛<br/>
+                        <strong class="strong-point">السبب:</strong> حتى تُطبق القواعد دائماً على مستوى السيرفر ولا يمكن تجاوزها، وتكون موحدة سواء تم استدعاء الخدمة من الـ Web Controller أو من تطبيق موبايل مستقبلي أو من API خارجي.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">FixNGo.Domain</span><br/>
+                        <span class="badge-lecture">ASP S05 Business Layer</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">6</td>
+                    <td class="col-question">الـ Entities والـ ViewModels موجودين في أنهي Layer؟</td>
+                    <td class="col-answer">
+                        - <strong class="strong-point">الـ Entities:</strong> موجودة في <span class="badge-code">FixNGo.Domain/Entities/</span> لأنها تمثل جداول وبيانات النظام الجوهرية.<br/>
+                        - <strong class="strong-point">الـ ViewModels:</strong> موجودة في <span class="badge-code">FixNGo.Web/ViewModels/</span> و <span class="badge-code">Models/</span> لأنها مرتبطة حصراً بتصميم واجهة الـ Presentation.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">FixNGo.Domain vs Web</span><br/>
+                        <span class="badge-lecture">ASP S03 Layering</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">7</td>
+                    <td class="col-question">لو هنغير SQL Server بـ PostgreSQL، هتعدل في أنهي ملفات؟</td>
+                    <td class="col-answer">
+                        التعديل سيكون محصوراً فقط في <strong class="strong-point"><span class="badge-code">FixNGo.Infrastructure</span></strong>:
+                        1. تثبيت حزمة <span class="badge-code">Npgsql.EntityFrameworkCore.PostgreSQL</span> في مشروع الـ Infrastructure.<br/>
+                        2. استبدال <span class="badge-code">options.UseSqlServer</span> بـ <span class="badge-code">options.UseNpgsql</span> في <span class="badge-code">DependencyInjection.cs</span>.<br/>
+                        3. تعديل نص الـ <span class="badge-code">ConnectionStrings</span> في <span class="badge-code">appsettings.json</span> وتوليد Migrations جديدة.<br/>
+                        ولا يُلمس أي سطر في الـ Domain أو Application أو Controllers!
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">DependencyInjection.cs</span><br/>
+                        <span class="badge-lecture">EF S03, ASP S08 Providers</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">8</td>
+                    <td class="col-question">لو هنعمل Mobile App بنفس الـ Business، إيه اللي هنعيد استخدامه وإيه اللي هنكتبه من جديد؟</td>
+                    <td class="col-answer">
+                        - <strong class="strong-point">ما سنعيد استخدامه بنسبة 100%:</strong> مشاريع <span class="badge-code">FixNGo.Domain</span> و <span class="badge-code">FixNGo.Application</span> و <span class="badge-code">FixNGo.Infrastructure</span> بكامل الجداول ومنطق العمل والمابينج والـ Validation.<br/>
+                        - <strong class="strong-point">ما سنكتبه جديداً:</strong> شاشات الموبايل (Flutter / React Native) ومتحكمات الـ API (<span class="badge-code">ApiController</span>) التي تُرجع بيانات JSON لتلك الشاشات.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-ref">Clean Architecture Reusability</span><br/>
+                        <span class="badge-lecture">ASP S08</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">9</td>
+                    <td class="col-question">يعني إيه Dependency Injection؟ وإيه علاقته بالـ IoC؟</td>
+                    <td class="col-answer">
+                        - الـ <strong class="strong-point">IoC (قلب التحكم):</strong> هو المبدأ الهندسي الذي ينص على سحب مسؤولية إدارة وإنشاء الكائنات من المبرمج وتسليمها لإطار العمل (Framework).<br/>
+                        - الـ <strong class="strong-point">Dependency Injection (DI):</strong> هو النمط والتطبيق العملي لـ IoC، حيث يقوم الإطار بحقن وتمرير الاعتماديات التي يطلبها الكلاس في الـ Constructor بدلاً من إنشائها يدوياً بـ <span class="badge-code">new</span>.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-lecture">ASP S08 Inversion of Control</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">10</td>
+                    <td class="col-question">وريني الـ Services المتسجلة في Program.cs. كل سطر بيسجل إيه؟</td>
+                    <td class="col-answer">
+                        في <span class="badge-code">Program.cs</span>:<br/>
+                        - <span class="badge-code">builder.Services.AddControllersWithViews()</span>: تسجيل خدمات الـ MVC ومحرك الـ Razor.<br/>
+                        - <span class="badge-code">builder.Services.AddInfrastructure(...)</span>: تسجيل الـ <span class="badge-code">AppDbContext</span> ومحرك قاعدة البيانات ونظام الـ Identity.<br/>
+                        - <span class="badge-code">builder.Services.AddAutoMapper(...)</span>: تسجيل ملفات المابينج لتحويل الـ Entities إلى DTOs.<br/>
+                        - <span class="badge-code">builder.Services.AddValidatorsFromAssemblyContaining(...)</span>: تسجيل فئات التحقق لـ FluentValidation.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">Program.cs</span><br/>
+                        <span class="badge-lecture">ASP S08 Service Registrations</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">11</td>
+                    <td class="col-question">ليه بنسجل Interface قصاد Class، مش الـ Class لوحده؟</td>
+                    <td class="col-answer">
+                        لتطبيق مبدأ <strong class="strong-point">الارتباط المرن (Loose Coupling)</strong>؛<br/>
+                        حتى يعتمد المستهلك (مثل الـ Controller) على العقد المجرد (Interface) وليس على الكلاس المنفذ، مما يمكننا لاحقاً من استبدال الكلاس أو إنشاء كائن وهمي (Mock Object) أثناء كتابة اختبارات الوحدة دون الحاجة لتعديل كود الـ Controller.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-lecture">ASP S08 Abstraction</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">12</td>
+                    <td class="col-question">اخترت Scoped ليه؟ وإمتى نستخدم Singleton أو Transient؟</td>
+                    <td class="col-answer">
+                        <ul class="answer-list">
+                            <li><strong class="strong-point">Scoped:</strong> يُنشئ كائناً واحداً فقط لكل HTTP Request ويشاركه عبر كل الخدمات حتى اكتمال الطلب (هو الاختيار الأمثل لـ <span class="badge-code">DbContext</span> وخدمات البزنس).</li>
+                            <li><strong class="strong-point">Transient:</strong> يُنشئ كائناً جديداً في كل مرة يُطلب فيها (يصلح للعمليات البسيطة عديمة الحالة Stateless Utilities).</li>
+                            <li><strong class="strong-point">Singleton:</strong> يُنشئ كائناً واحداً فقط يعيش طوال فترة تشغيل السيرفر بالكامل (يصلح لإعدادات الـ Configuration والـ Caching).</li>
+                        </ul>
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-lecture">ASP S08 Service Lifetimes</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">13</td>
+                    <td class="col-question">الـ AddDbContext بيسجل الـ Context بأنهي Lifetime؟ وليه؟</td>
+                    <td class="col-answer">
+                        يسجله افتراضياً بنطاق <strong class="strong-point">Scoped</strong>؛<br/>
+                        <strong class="strong-point">السبب:</strong> لضمان أن كل العمليات المنفذة في نفس الـ HTTP Request تشارك نفس الـ DbContext ونفس الـ Database Transaction لضمان اتساق البيانات (Consistency)، ولتجنب استهلاك اتصالات الداتابيز ومشاكل الـ Multithreading.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-lecture">ASP S08, EF S04 Scoped Context</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">14</td>
+                    <td class="col-question">لو Service محتاجة Service تانية في الـ Constructor، مين بيوفرهالها؟</td>
+                    <td class="col-answer">
+                        الـ <strong class="strong-point">IoC / DI Container</strong> يقوم بحلها تلقائياً من خلال بناء شجرة الاعتماديات (Dependency Tree Resolution) وتوفير الكائنات المطلوبة بالترتيب الصحيح طالما أن كِلا الخدمتين مسجلتان في <span class="badge-code">Program.cs</span>.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-lecture">ASP S08 IoC Container</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">15</td>
+                    <td class="col-question">لو مسحت سطر تسجيل Service من Program.cs، إيه اللي هيحصل؟</td>
+                    <td class="col-answer">
+                        المشروع سيترجم بدون أخطاء (Build Succeeds)، ولكن عند تشغيل التطبيق وطلب أي صفحة أو متحكم يحتاج تلك الخدمة في الـ Constructor، سيرمي النظام فوراً استثناء <span class="badge-code">System.InvalidOperationException</span> برسالة شهيرة:<br/>
+                        <div class="code-snippet">Unable to resolve service for type 'FixNGo.Application...' while attempting to activate 'FixNGo.Web.Controllers...'</div>
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-lecture">ASP S08 DI Resolution Errors</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section-block">
+        <div class="section-header">
+            <span>6. واجهات العرض ومحرك Razor (Razor Views &amp; Tag Helpers)</span>
+            <span class="section-tag">6 أسئلة وإجابة نموذجية</span>
+        </div>
+
+        <div class="questions-summary">
+            <h4>قائمة الأسئلة السريعة:</h4>
+            <ol>
+                <li>وريني View فيه model@. ليه Strongly Typed مش ViewBag؟</li>
+                <li>وريني الـ Layout. الـ RenderBody بتعمل إيه؟ وفين ViewStart_؟</li>
+                <li>وريني فورم معمول بالـ Tag Helpers. asp-for بيولد إيه في الـ HTML؟</li>
+                <li>وريني Dropdown. القائمة بتاعته جاية منين؟</li>
+                <li>وريني Partial View عندك. ليه عملته Partial؟</li>
+                <li>رسايل الـ Validation بتظهر في الـ View إزاي؟</li>
+            </ol>
+        </div>
+
+        <div class="evidence-heading">الدليل النموذجي والإجابات التفصيلية من واقع كود ومواصفات FixNGo:</div>
+
+        <table class="qna-table">
+            <thead>
+                <tr>
+                    <th class="col-id">#</th>
+                    <th class="col-question">السؤال</th>
+                    <th class="col-answer">الإجابة النموذجية والدليل من كود وتطبيق FixNGo</th>
+                    <th class="col-source">المرجع من المشروع</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="col-id">1</td>
+                    <td class="col-question">وريني View فيه model@. ليه Strongly Typed مش ViewBag؟</td>
+                    <td class="col-answer">
+                        في <span class="badge-code">Views/TowProvider/Profile.cshtml</span> أول سطر: <span class="badge-code">@model FixNGo.Web.ViewModels.TowProviderProfileViewModel</span>.<br/>
+                        <strong class="strong-point">ليه Strongly-Typed:</strong> لأن الـ Strongly-Typed يمنحنا فحص الأخطاء أثناء الـ Compilation (Compile-time Checking) ودعم كامل للـ IntelliSense؛ فلو كتبنا اسم خاصية بالخطأ يظهر فوراً كخطأ، بينما <span class="badge-code">ViewBag</span> نوع ديناميكي لا تظهر أخطاؤه الإملائية إلا بانهيار الصفحة في وقت التشغيل.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">TowProvider/Profile.cshtml</span><br/>
+                        <span class="badge-lecture">ASP S02, S03 Strongly Typed</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">2</td>
+                    <td class="col-question">وريني الـ Layout. الـ RenderBody بتعمل إيه؟ وفين ViewStart_؟</td>
+                    <td class="col-answer">
+                        - الـ Layout موجود في <span class="badge-code">Views/Shared/_Layout.cshtml</span> ويحتوي على الهيكل المشترك (Navbar, Sidebar, Theme Toggle, Footer).<br/>
+                        - <strong class="strong-point"><span class="badge-code">@RenderBody()</span>:</strong> هي ميثود حجز المكان التي تحقن المحتوى الخاص بكل صفحة داخل القالب العام.<br/>
+                        - <strong class="strong-point"><span class="badge-code">_ViewStart.cshtml</span>:</strong> موجود مباشرة داخل مجلد <span class="badge-code">Views/</span> وهو الذي يحدد تطبيق <span class="badge-code">_Layout</span> افتراضياً على كافة الصفحات.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">Views/Shared/_Layout.cshtml</span><br/>
+                        <span class="badge-code">Views/_ViewStart.cshtml</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">3</td>
+                    <td class="col-question">وريني فورم معمول بالـ Tag Helpers. asp-for بيولد إيه في الـ HTML؟</td>
+                    <td class="col-answer">
+                        في فورم الملف الشخصي <span class="badge-code">Views/ServiceCenters/Profile.cshtml</span> سطر 89:
+                        <div class="code-snippet">&lt;input asp-for="Name" class="form-control" /&gt;</div>
+                        <strong class="strong-point">يولد في الـ HTML:</strong><br/>
+                        <div class="code-snippet">&lt;input type="text" id="Name" name="Name" value="Al-Amal Center" data-val="true" data-val-required="Center name is required." class="form-control" /&gt;</div>
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">ServiceCenters/Profile.cshtml</span><br/>
+                        <span class="badge-lecture">ASP S04, S05, S06 Tag Helpers</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">4</td>
+                    <td class="col-question">وريني Dropdown. القائمة بتاعته جاية منين؟</td>
+                    <td class="col-answer">
+                        في <span class="badge-code">Views/Provider/Profile.cshtml</span> لقائمة التخصص:
+                        <div class="code-snippet">&lt;select asp-for="PrimaryServiceType" asp-items="Html.GetEnumSelectList&lt;AssistanceType&gt;()" class="form-select"&gt;&lt;/select&gt;</div>
+                        القائمة مولدة تلقائياً من الـ Enum <span class="badge-code">AssistanceType</span> وتحدد العنصر المختار تلقائياً بناءً على قيمة الموديل، وفي شاشات حجز المراكز تأتي باقة الخدمات من قائمة <span class="badge-code">ViewBag.Services</span> التي جُلبت من الداتابيز.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">Provider/Profile.cshtml</span><br/>
+                        <span class="badge-lecture">ASP S04, S05 SelectList</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">5</td>
+                    <td class="col-question">وريني Partial View عندك. ليه عملته Partial؟</td>
+                    <td class="col-answer">
+                        لدينا عدة ملفات جزئية مثل <span class="badge-code">_AdminNav.cshtml</span> و <span class="badge-code">_TowNav.cshtml</span> و <span class="badge-code">_ValidationScriptsPartial.cshtml</span>.<br/>
+                        <strong class="strong-point">ليه عملناها Partial:</strong> لتطبيق مبدأ عدم تكرار الكود (DRY)؛ فشريط تبويبات الونش أو الأدمن يتكرر في 5 شاشات مختلفة، فكتابته في Partial View تجعل أي تعديل مستقبلي في الروابط يتم في مكان واحد فقط وينعكس فوراً على كل الصفحات.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">Views/Shared/_AdminNav.cshtml</span><br/>
+                        <span class="badge-lecture">Partial Views Architecture</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">6</td>
+                    <td class="col-question">رسايل الـ Validation بتظهر في الـ View إزاي؟</td>
+                    <td class="col-answer">
+                        - لكل حقل على حدة عبر: <span class="badge-code">&lt;span asp-validation-for="Phone" class="text-danger small"&gt;&lt;/span&gt;</span> وتظهر الرسالة المحددة باللون الأحمر بجانب الحقل مباشرة.<br/>
+                        - ولملخص كافة أخطاء النموذج عبر: <span class="badge-code">&lt;div asp-validation-summary="All" class="text-danger small mb-3"&gt;&lt;/div&gt;</span>.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">TowProvider/Profile.cshtml</span><br/>
+                        <span class="badge-lecture">ASP S05, S06 Validation Tag Helpers</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section-block">
+        <div class="section-header">
+            <span>7. الـ Web API وواجهات React اللحظية (Web API &amp; React Integration)</span>
+            <span class="section-tag">12 سؤال وإجابة نموذجية</span>
+        </div>
+
+        <div class="questions-summary">
+            <h4>قائمة الأسئلة السريعة:</h4>
+            <ol>
+                <li>ليه عملت API وعندك MVC؟ مين اللي بيستخدمه؟</li>
+                <li>وريني الـ Endpoints بتاعة Resource واحد في Swagger: الـ Verb والـ URL لكل عملية.</li>
+                <li>إيه الفرق بين الـ API Controller والـ MVC Controller عندك؟</li>
+                <li>اطلب عنصر مش موجود من Swagger: الـ API رجع Status Code كام؟ وبعد الـ POST بيرجع كام؟</li>
+                <li>الـ API بيرجع الـ Entity ولا DTO؟ وليه؟</li>
+                <li>الـ API والـ MVC بيستخدموا نفس الـ Repository أو الـ Service؟ وريني.</li>
+                <li>وريني Component عندك. إيه الـ Props وإيه الـ State فيه؟</li>
+                <li>بتجيب الداتا من الـ API فين وإزاي؟</li>
+                <li>ليه useEffect هنا؟ والـ Dependency Array معناه إيه؟</li>
+                <li>وريني فورم: الداتا بتبعت للـ API إزاي؟ وبتتعامل مع الأخطاء إزاي؟</li>
+                <li>الـ Token بعد الـ Login بتخزنه فين؟ وبتبعته مع كل Request إزاي؟</li>
+                <li>جالك CORS Error قبل كده؟ اتحل في الـ React ولا في الـ API؟</li>
+            </ol>
+        </div>
+
+        <div class="evidence-heading">الدليل النموذجي والإجابات التفصيلية من واقع كود ومواصفات FixNGo:</div>
+
+        <table class="qna-table">
+            <thead>
+                <tr>
+                    <th class="col-id">#</th>
+                    <th class="col-question">السؤال</th>
+                    <th class="col-answer">الإجابة النموذجية والدليل من كود وتطبيق FixNGo</th>
+                    <th class="col-source">المرجع من المشروع</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="col-id">1</td>
+                    <td class="col-question">ليه عملت API وعندك MVC؟ مين اللي بيستخدمه؟</td>
+                    <td class="col-answer">
+                        - الـ <strong class="strong-point">MVC</strong> مخصص لمتصفح الويب لإنتاج واجهات HTML كاملة للمستخدمين على الحواسب والموبايل.<br/>
+                        - الـ <strong class="strong-point">Web API</strong> مخصص لتغذية تطبيقات الموبايل المستقبلية (iOS / Android للعملاء والمزودين)، ولدعم شاشات React التفاعلية اللحظية (مثل خريطة التتبع المباشر للونش)، ولتكامل الأنظمة مع بوابات الدفع وشركات التأمين (B2B Integration).
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-ref">SRS: Section 2.1 &amp; 3.3</span><br/>
+                        <span class="badge-lecture">API vs MVC</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">2</td>
+                    <td class="col-question">وريني الـ Endpoints بتاعة Resource واحد في Swagger: الـ Verb والـ URL لكل عملية.</td>
+                    <td class="col-answer">
+                        لـ Resource طلبات الاستغاثة <strong class="strong-point"><span class="badge-code">api/assistance-requests</span></strong>:
+                        <ul class="answer-list">
+                            <li><strong class="strong-point">GET</strong> <span class="badge-code">/api/assistance-requests</span> ➔ جلب كل الطلبات.</li>
+                            <li><strong class="strong-point">GET</strong> <span class="badge-code">/api/assistance-requests/{id}</span> ➔ تفاصيل طلب محدد.</li>
+                            <li><strong class="strong-point">POST</strong> <span class="badge-code">/api/assistance-requests</span> ➔ إنشاء طلب إغاثة جديد.</li>
+                            <li><strong class="strong-point">PUT</strong> <span class="badge-code">/api/assistance-requests/{id}/status</span> ➔ تحديث مرحلة الطلب.</li>
+                            <li><strong class="strong-point">DELETE</strong> <span class="badge-code">/api/assistance-requests/{id}</span> ➔ إلغاء الطلب.</li>
+                        </ul>
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-ref">Swagger UI / OpenApi</span><br/>
+                        <span class="badge-lecture">RESTful Standards</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">3</td>
+                    <td class="col-question">إيه الفرق بين الـ API Controller والـ MVC Controller عندك؟</td>
+                    <td class="col-answer">
+                        - <strong class="strong-point">الـ API Controller:</strong> يرث من <span class="badge-code">ControllerBase</span> ومزود بـ <span class="badge-code">[ApiController]</span> ويرجع كائنات بيانات مجردة بصيغة JSON مع HTTP Status Codes مناسبة.<br/>
+                        - <strong class="strong-point">الـ MVC Controller:</strong> يرث من كلاس <span class="badge-code">Controller</span> الكامل ويرجع واجهات عرض ورسومات كاملة عبر <span class="badge-code">View()</span> مدمجة بكود الـ HTML.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-lecture">ASP S03 Controller Inheritance</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">4</td>
+                    <td class="col-question">اطلب عنصر مش موجود من Swagger: الـ API رجع Status Code كام؟ وبعد الـ POST بيرجع كام؟</td>
+                    <td class="col-answer">
+                        - عند طلب عنصر غير موجود يرجع: <strong class="strong-point"><span class="badge-code">404 Not Found</span></strong>.<br/>
+                        - وبعد نجاح عملية الـ POST يرجع: <strong class="strong-point"><span class="badge-code">201 Created</span></strong> مع رابط الكائن الجديد في الـ Header (عبر <span class="badge-code">CreatedAtAction</span>).<br/>
+                        - وإذا كانت المدخلات غير صالحة يرجع: <strong class="strong-point"><span class="badge-code">400 Bad Request</span></strong>.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-lecture">HTTP Status Codes Standard</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">5</td>
+                    <td class="col-question">الـ API بيرجع الـ Entity ولا DTO؟ وليه؟</td>
+                    <td class="col-answer">
+                        يرجع دائماً <strong class="strong-point">DTO</strong> (مثل <span class="badge-code">ProviderRequestSummaryDto</span>).<br/>
+                        <strong class="strong-point">السبب:</strong><br/>
+                        1. منع حدوث <strong class="strong-point">Circular Reference Loop</strong> أثناء عمل JSON Serialization بسبب الـ Navigation Properties بين الجداول.<br/>
+                        2. أمان البيانات (Security): لمنع إرسال حقول حساسة للعميل مثل <span class="badge-code">PasswordHash</span>.<br/>
+                        3. استقلال العقد: بحيث لو غيرنا أسماء أعمدة الداتابيز تظل الـ API تعمل بدون كسر تطبيقات الموبايل.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">FixNGo.Application/Features</span><br/>
+                        <span class="badge-lecture">ASP S03 DTO Security</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">6</td>
+                    <td class="col-question">الـ API والـ MVC بيستخدموا نفس الـ Repository أو الـ Service؟ وريني.</td>
+                    <td class="col-answer">
+                        <strong class="strong-point">نعم، بالقطع!</strong> كِلا المتحكمين يحقن نفس واجهة الخدمة <span class="badge-code">IProviderService</span> المعرفة في طبقة التطبيق <span class="badge-code">FixNGo.Application</span>؛<br/>
+                        منطق البزنس وحساب تكاليف رحلات السحب مكتوب مرة واحدة فقط، ويتم استدعاؤه من الـ MVC Controller لعرض الـ Views، ويتم استدعاؤه من الـ API Controller لإرجاع الـ JSON.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">IProviderService.cs</span><br/>
+                        <span class="badge-lecture">ASP S08 Code Reusability</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">7</td>
+                    <td class="col-question">وريني Component عندك. إيه الـ Props وإيه الـ State فيه؟</td>
+                    <td class="col-answer">
+                        في مكونات التتبع التفاعلية (مثل <span class="badge-code">04_TowCaptain.js</span> أو شاشات المتابعة):<br/>
+                        - <strong class="strong-point">الـ Props:</strong> هي البيانات الثابتة الممررة للمكون من الأب ولا تتغير داخله (مثل معرف الطلب <span class="badge-code">requestId</span> أو بيانات السيارة الأساسية).<br/>
+                        - <strong class="strong-point">الـ State:</strong> هي البيانات اللحظية الخاصة بالمكون التي يؤدي تغيرها لإعادة رسم الشاشة (مثل إحداثيات موقع الونش الحالية <span class="badge-code">currentLat, currentLng</span> ومرحلة الرحلة <span class="badge-code">tripStage</span> عبر <span class="badge-code">useState</span>).
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">04_TowCaptain.js</span><br/>
+                        <span class="badge-lecture">React Fundamentals</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">8</td>
+                    <td class="col-question">بتجيب الداتا من الـ API فين وإزاي؟</td>
+                    <td class="col-answer">
+                        بنجيبها داخل الـ Hook الشهير <strong class="strong-point"><span class="badge-code">useEffect</span></strong> باستخدام مكتبة <span class="badge-code">axios</span> أو <span class="badge-code">fetch</span>:<br/>
+                        <div class="code-snippet">useEffect(() =&gt; {<br/>
+&nbsp;&nbsp;axios.get('/api/assistance-requests/active')<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.then(res =&gt; setActiveTrip(res.data))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.catch(err =&gt; console.error(err));<br/>
+}, []);</div>
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-lecture">React Data Fetching</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">9</td>
+                    <td class="col-question">ليه useEffect هنا؟ والـ Dependency Array معناه إيه؟</td>
+                    <td class="col-answer">
+                        - <strong class="strong-point">ليه useEffect:</strong> لتنفيذ عمليات جلب البيانات الجانبية (Side Effects) بعد اكتمال بناء وتحميل المكون على الشاشة (Component Mount) دون تجميد المتصفح.<br/>
+                        - <strong class="strong-point">الـ Dependency Array:</strong> القوس الفارغ <span class="badge-code">[]</span> يعني تنفيذ الكود مرة واحدة فقط عند فتح الصفحة. وإذا وضعنا قيمة بداخلها <span class="badge-code">[requestId]</span>، سيعاد استدعاء الـ API في كل مرة يتغير فيها رقم الطلب.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-lecture">React Hooks Lifecycle</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">10</td>
+                    <td class="col-question">وريني فورم: الداتا بتبعت للـ API إزاي؟ وبتتعامل مع الأخطاء إزاي؟</td>
+                    <td class="col-answer">
+                        - تُربط الحقول بـ <strong class="strong-point">Controlled Inputs</strong> في الـ State، وعند الضغط على إرسال نمنع إعادة تحميل الصفحة عبر <span class="badge-code">e.preventDefault()</span> ونرسل كائن الـ JSON عبر <span class="badge-code">axios.post('/api/bookings', formData)</span>.<br/>
+                        - عند حدوث خطأ (<span class="badge-code">catch</span>)، نفحص <span class="badge-code">error.response.status</span>؛ إذا كان 400 نستخرج مصفوفة أخطاء الـ Validation ونعرضها تحت الحقول، وإذا كان 500 نعرض تنبيهاً عاماً بتعذر الاتصال.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-lecture">React Form &amp; Validation</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">11</td>
+                    <td class="col-question">الـ Token بعد الـ Login بتخزنه فين؟ وبتبعته مع كل Request إزاي؟</td>
+                    <td class="col-answer">
+                        - يُخزن في الـ <strong class="strong-point"><span class="badge-code">localStorage</span></strong> أو في <span class="badge-code">HttpOnly Secure Cookie</span>.<br/>
+                        - ونرسله مع كل طلب HTTP في الـ Header التابع لبروتوكول الأمان:
+                        <div class="code-snippet">Authorization: Bearer &lt;JWT_TOKEN&gt;</div>
+                        ويتم حقنه تلقائياً في كل الطلبات باستخدام <strong class="strong-point">Axios Interceptors</strong>.
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-lecture">JWT Authentication</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-id">12</td>
+                    <td class="col-question">جالك CORS Error قبل كده؟ اتحل في الـ React ولا في الـ API؟</td>
+                    <td class="col-answer">
+                        نعم! خطأ <strong class="strong-point">CORS (Cross-Origin Resource Sharing)</strong> يحدث عندما يمنع المتصفح كود JavaScript القادم من بورت معين (مثل React على 3000) من التحدث مع سيرفر على بورت مختلف (مثل .NET على 60101).<br/>
+                        <strong class="strong-point">الحل يتم دائماً في السيرفر (الـ API) وليس في React:</strong> بتسجيل سياسة CORS في <span class="badge-code">Program.cs</span>:
+                        <div class="code-snippet">builder.Services.AddCors(opt =&gt; opt.AddPolicy("AllowReact",<br/>
+&nbsp;&nbsp;p =&gt; p.WithOrigins("http://localhost:3000").AllowAnyHeader().AllowAnyMethod()));<br/>
+app.UseCors("AllowReact");</div>
+                    </td>
+                    <td class="col-source">
+                        <span class="badge-code">Program.cs:CORS</span><br/>
+                        <span class="badge-lecture">CORS Policy Configuration</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer-note">
+        <strong>FixNGo — DEPI Training Project</strong> | إعداد الفريق تحت إشراف م. عبد الرحمن شعبان | تم إعداد هذا الملف كمرجع كامل وشامل للمناقشات والتقييم الفني.
+    </div>
+
+</body>
+</html>

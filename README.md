@@ -106,3 +106,19 @@ dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=localhost,
   ```
 - Run `dotnet build` and `dotnet test` before pushing.
 - Keep local settings in `dotnet user-secrets`, not in `appsettings.json`.
+
+---
+
+## Project Documentation & Engineering References
+
+All technical references, oral follow-up guides, specifications, and AI workflow files are cataloged directly within the repository:
+
+| Document / Asset | Location | Description |
+|---|---|---|
+| **دليل أسئلة المتابعة والتقييم الشامل** | [`docs/اسئلة_متابعة_مشروع_FixNGo_الشاملة.pdf`](docs/اسئلة_متابعة_مشروع_FixNGo_الشاملة.pdf) | 88 أسئلة وأجوبة نموذجية مفصلة تغطي كافة جوانب البزنس، المعمارية، الـ EF Core، ودورة حياة الـ MVC. |
+| **وثيقة مواصفات المتطلبات (SRS)** | [`docs/FixNGo_SRS.pdf`](docs/FixNGo_SRS.pdf) | مواصفات النظام الوظيفية (FR) وقواعد العمل (BR) والمتطلبات غير الوظيفية (NFR). |
+| **ملف حالة المشروع (State File)** | [`STATE.md`](STATE.md) | سجل الحالة اللحظية لمراحل التطوير المنجزة، القرارات الهندسية (ADR)، والخطوات القادمة. |
+| **ملف وكيل الـ AI (Agent File)** | [`AGENT.md`](AGENT.md) | أدوار ومهام الـ AI، التوجيهات الهندسية، وقواعد جودة الكود وعدم كسر الـ Business Logic. |
+| **عقد ومواصفة الفريق المشتركة** | [`TEAM_SPEC_CONTRACT.md`](TEAM_SPEC_CONTRACT.md) | ميثاق العمل الجماعي، توحيد نماذج الـ Validation، ومسارات التحكم للأطراف الثلاثة. |
+| **مكونات الـ Frontend التفاعلية** | [`FixNGo/`](FixNGo/) | شاشات ومكونات التتبع التفاعلية للـ React والـ JavaScript (`01_AuthOnboarding.js` حتى `07_SharedSettings.js`). |
+| **واجهات الـ REST API** | [`FixNGo.Web/Controllers/Api/`](FixNGo.Web/Controllers/Api/) | واجهات الـ Web API المخصصة لخدمات طلبات الطوارئ والتتبع اللحظي لمواقع المزودين. |
