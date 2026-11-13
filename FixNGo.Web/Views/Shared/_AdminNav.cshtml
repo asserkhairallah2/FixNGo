@@ -1,0 +1,48 @@
+@{
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "Dashboard";
+}
+
+<div class="card border-0 shadow-sm mb-4 bg-body-tertiary">
+    <div class="card-body p-2">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <div class="d-flex align-items-center gap-2 px-2">
+                <span class="badge rounded-pill bg-danger">
+                    <i class="bi bi-shield-lock-fill me-1"></i> Admin Portal
+                </span>
+                <small class="text-muted d-none d-md-inline">Coordination & Platform Management</small>
+            </div>
+            <ul class="nav nav-pills flex-wrap gap-1">
+                <li class="nav-item">
+                    <a class="nav-link btn-sm py-1 px-3 @(currentAction == "Dashboard" ? "active bg-danger text-white fw-bold" : "text-body")"
+                       asp-controller="Admin" asp-action="Dashboard">
+                        <i class="bi bi-speedometer2 me-1"></i>Overview
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn-sm py-1 px-3 @(currentAction == "Requests" ? "active bg-danger text-white fw-bold" : "text-body")"
+                       asp-controller="Admin" asp-action="Requests">
+                        <i class="bi bi-telephone-inbound-fill me-1"></i>Roadside Requests
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn-sm py-1 px-3 @(currentAction == "Bookings" ? "active bg-danger text-white fw-bold" : "text-body")"
+                       asp-controller="Admin" asp-action="Bookings">
+                        <i class="bi bi-calendar2-check-fill me-1"></i>Center Bookings
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn-sm py-1 px-3 @(currentAction == "Providers" ? "active bg-danger text-white fw-bold" : "text-body")"
+                       asp-controller="Admin" asp-action="Providers">
+                        <i class="bi bi-patch-check-fill me-1"></i>Verification Queue
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn-sm py-1 px-3 @(currentAction == "Users" ? "active bg-danger text-white fw-bold" : "text-body")"
+                       asp-controller="Admin" asp-action="Users">
+                        <i class="bi bi-people-fill me-1"></i>Users
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace FixNGo.Web.ViewModels;
 
@@ -129,20 +130,37 @@ public class TowHistoryItemViewModel
 
 public class TowProviderProfileViewModel
 {
+    [Required(ErrorMessage = "Full Name is required.")]
+    [StringLength(100, MinimumLength = 3, ErrorMessage = "Full Name must be between 3 and 100 characters.")]
     public string FullName { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Phone number is required.")]
+    [Phone(ErrorMessage = "Invalid phone number format.")]
     public string PhoneNumber { get; set; } = string.Empty;
+
+    [EmailAddress(ErrorMessage = "Invalid email address format.")]
     public string Email { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Operating city is required.")]
     public string City { get; set; } = string.Empty;
 
     // بيانات الونش
-    public string TruckType { get; set; } = string.Empty; // ونش مسطح هيدروليك (Flatbed) / ونش رفع (Wheel-Lift)
+    [Required(ErrorMessage = "Truck type is required.")]
+    public string TruckType { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Truck Make & Model is required.")]
     public string TruckMakeModel { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Truck license plate number is required.")]
     public string TruckPlateNumber { get; set; } = string.Empty;
-    public double MaxLoadCapacityTons { get; set; } // السعة بالطن
-    public string SupportedVehicleTypes { get; set; } = string.Empty; // ملاكي، SUV، نقل خفيف
+
+    [Range(0.5, 50.0, ErrorMessage = "Load capacity must be between 0.5 and 50 tons.")]
+    public double MaxLoadCapacityTons { get; set; }
+
+    public string SupportedVehicleTypes { get; set; } = string.Empty;
 
     // حالة التحقق والمستندات
-    public string VerificationStatus { get; set; } = "VERIFIED"; // PENDING_VERIFICATION, VERIFIED, REJECTED
+    public string VerificationStatus { get; set; } = "VERIFIED";
     public List<TowDocumentItemViewModel> Documents { get; set; } = new();
 }
 

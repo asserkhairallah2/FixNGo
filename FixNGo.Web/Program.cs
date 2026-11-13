@@ -1,14 +1,23 @@
+using FixNGo.Application.Common.Mappings;
+using FixNGo.Application.Common.Validation;
 using FixNGo.Domain.Entities;
 using FixNGo.Domain.Enums;
 using FixNGo.Infrastructure;
 using FixNGo.Infrastructure.Persistence;
 using FixNGo.Web.Hubs;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // 1. Add Infrastructure & Application Services (Clean Architecture Composition Root)
 builder.Services.AddInfrastructure(builder.Configuration);
+
+// 1.1 AutoMapper & FluentValidation
+builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<UpdateProviderProfileDtoValidator>();
 
 // 2. Configure ASP.NET Core Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>

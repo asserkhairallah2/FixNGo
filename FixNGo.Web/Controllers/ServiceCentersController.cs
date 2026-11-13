@@ -1,23 +1,100 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
-using FixNGo.Web.Models;
 using System.Threading.Tasks;
+using AutoMapper;
 using FixNGo.Application.Abstractions.Persistence;
+using FixNGo.Application.Common.Mappings;
+using FixNGo.Domain.Entities;
+using FixNGo.Domain.Enums;
+using FixNGo.Infrastructure.Persistence;
+using FixNGo.Web.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace FixNGo.Web.Controllers;
 
 /// <summary>
-/// Sample MVC Controller demonstrating full server-rendered Razor UI alongside domain repositories.
+/// Controller for managing Service Centers, service catalogs, business hours, and customer center directory.
 /// </summary>
 public class ServiceCentersController : Controller
 {
     private readonly IServiceCenterRepository _serviceCenterRepository;
+    private readonly AppDbContext _context;
+    private readonly IMapper _mapper;
 
-    public ServiceCentersController(IServiceCenterRepository serviceCenterRepository)
+    public ServiceCentersController(
+        IServiceCenterRepository serviceCenterRepository,
+        AppDbContext context,
+        IMapper mapper)
     {
         _serviceCenterRepository = serviceCenterRepository;
+        _context = context;
+        _mapper = mapper;
+    }
+
+    // GET: /ServiceCenters
+    // Displays service centers directory with Search, Filter by City, Sorting, and Pagination.
+    [HttpGet]
+    public async Task<IActionResult> Index(
+        string? search, 
+        string? city, 
+        string? sortOrder, 
+        int pageNumber = 1, 
+        int pageSize = 6, 
+        CancellationToken cancellationToken = default)
+    {
+        var centers = await _serviceCenterRepository.GetAllAsync(cancellationToken);
+        var query = centers.AsQueryable();
+
+        // 1. Search / Filter
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var s = search.Trim().ToLowerInvariant();
+            query = query.Where(c => (c.Name != null && c.Name.ToLower().Contains(s))
+                                  || (c.Address != null && c.Address.ToLower().Contains(s))
+                                  || c.Services.Any(sv => sv.Name != null && sv.Name.ToLower().Contains(s)));
+        }
+
+        if (!string.IsNullOrWhiteSpace(city))
+        {
+            var cLower = city.Trim().ToLowerInvariant();
+            query = query.Where(c => c.Address != null && c.Address.ToLower().Contains(cLower));
+        }
+
+        // 2. Sort
+        query = sortOrder switch
+        {
+            "name_desc" => query.OrderByDescending(c => c.Name),
+            "rating_desc" => query.OrderByDescending(c => c.Rating).ThenByDescending(c => c.TotalReviews),
+            "rating_asc" => query.OrderBy(c => c.Rating),
+            _ => query.OrderBy(c => c.Name) // default name_asc
+        };
+
+        // 3. Pagination
+        if (pageNumber < 1) pageNumber = 1;
+        var totalCount = query.Count();
+        var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+        var items = query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+
+        // 4. AutoMapper DTO projection
+        var dtos = _mapper.Map<List<ServiceCenterDto>>(items);
+
+        var viewModel = new ServiceCenterIndexViewModel
+        {
+            Items = dtos,
+            Search = search,
+            City = city,
+            SortOrder = sortOrder,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalCount = totalCount,
+            TotalPages = totalPages,
+            AvailableCities = new List<string> { "Cairo", "Giza", "Alexandria", "6th of October" }
+        };
+
+        return View(viewModel);
     }
 
     // GET: /ServiceCenters/Details/5
@@ -26,101 +103,99 @@ public class ServiceCentersController : Controller
         var center = await _serviceCenterRepository.GetByIdAsync(id, cancellationToken);
         if (center == null)
         {
-            return NotFound();
+            return NotFound("Service center not found.");
         }
 
         return View(center);
     }
+
     // GET: /ServiceCenters/WorkingHours/5
     [HttpGet]
     public async Task<IActionResult> WorkingHours(int id, CancellationToken cancellationToken)
     {
         var center = await _serviceCenterRepository.GetByIdAsync(id, cancellationToken);
 
-        // Return blank 7-day schedule when center doesn't exist yet so page still renders
         if (center == null || !center.WorkingHours.Any())
         {
             var blank = Enum.GetValues<DayOfWeek>()
-                .Select(day => new FixNGo.Domain.Entities.WorkingHours
+                .Select(day => new WorkingHours
                 {
                     ServiceCenterId = id,
                     DayOfWeek = day,
                     OpenTime = TimeSpan.FromHours(8),
-                    CloseTime = TimeSpan.FromHours(18)
+                    CloseTime = TimeSpan.FromHours(18),
+                    IsClosed = (day == DayOfWeek.Friday)
                 }).ToList();
             return View(blank);
         }
 
-        return View(center.WorkingHours);
+        return View(center.WorkingHours.OrderBy(w => w.DayOfWeek).ToList());
     }
+
     // POST: /ServiceCenters/WorkingHours
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> WorkingHours(int id, List<FixNGo.Domain.Entities.WorkingHours> workingHours, CancellationToken cancellationToken)
+    public async Task<IActionResult> WorkingHours(int id, List<WorkingHours> workingHours, CancellationToken cancellationToken)
     {
-  
-        TempData["Success"] = "Business hours have been successfully updated.!";
+        var center = await _serviceCenterRepository.GetByIdAsync(id, cancellationToken);
+        if (center != null && workingHours != null)
+        {
+            foreach (var item in workingHours)
+            {
+                var existing = center.WorkingHours.FirstOrDefault(w => w.DayOfWeek == item.DayOfWeek);
+                if (existing != null)
+                {
+                    existing.OpenTime = item.OpenTime;
+                    existing.CloseTime = item.CloseTime;
+                    existing.IsClosed = item.IsClosed;
+                    existing.UpdatedAt = DateTime.UtcNow;
+                }
+                else
+                {
+                    item.ServiceCenterId = id;
+                    item.CreatedAt = DateTime.UtcNow;
+                    _context.WorkingHours.Add(item);
+                }
+            }
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        TempData["Success"] = "Business hours have been successfully updated!";
         return RedirectToAction(nameof(Details), new { id = id });
     }
 
     // GET: /ServiceCenters/VerificationDocuments/1
     [HttpGet]
-    public IActionResult VerificationDocuments(int id = 1)
+    public async Task<IActionResult> VerificationDocuments(int id = 1)
     {
-        // Static mock data for Egyptian compliance and verification documents
+        var center = await _context.ServiceCenters.FirstOrDefaultAsync(sc => sc.Id == id);
+        string centerName = center?.Name ?? "FixNGo Certified Center";
+
         var model = new VerificationDocumentsViewModel
         {
             CenterId = id,
-            CenterName = "Al-Nasr Certified Service Center",
+            CenterName = centerName,
             Documents = new List<VerificationDocumentItem>
             {
                 new()
                 {
                     Id = 1,
                     DocumentType = "CommercialRegister",
-                    TitleEn = "Commercial Register",
-                    TitleAr = string.Empty,
-                    FileName = "commercial_register_2025.pdf",
+                    TitleEn = "Commercial Register (السجل التجاري)",
+                    FileName = "commercial_register_cairo.pdf",
                     FileSize = "2.4 MB",
                     UploadedAt = DateTime.UtcNow.AddMonths(-3),
-                    Status = DocumentStatus.Approved,
-                    RejectionReason = null
+                    Status = center?.VerificationStatus == VerificationStatus.Verified ? DocumentStatus.Approved : DocumentStatus.Pending
                 },
                 new()
                 {
                     Id = 2,
                     DocumentType = "TaxCard",
-                    TitleEn = "Tax Card",
-                    TitleAr = string.Empty,
+                    TitleEn = "Tax Card (البطاقة الضريبية)",
                     FileName = "tax_card_scan.pdf",
                     FileSize = "1.1 MB",
                     UploadedAt = DateTime.UtcNow.AddDays(-2),
-                    Status = DocumentStatus.Pending,
-                    RejectionReason = null
-                },
-                new()
-                {
-                    Id = 3,
-                    DocumentType = "ShopOperatingLicense",
-                    TitleEn = "Shop Operating License",
-                    TitleAr = string.Empty,
-                    FileName = "shop_license_2025.pdf",
-                    FileSize = "3.8 MB",
-                    UploadedAt = DateTime.UtcNow.AddDays(-5),
-                    Status = DocumentStatus.Rejected,
-                    RejectionReason = "The uploaded copy has expired on 31/12/2025. Please upload a renewed valid license bearing the local district stamp."
-                },
-                new()
-                {
-                    Id = 4,
-                    DocumentType = "OwnerNationalId",
-                    TitleEn = "Owner National ID",
-                    TitleAr = string.Empty,
-                    FileName = "owner_national_id_front_back.jpg",
-                    FileSize = "850 KB",
-                    UploadedAt = DateTime.UtcNow.AddMonths(-2),
-                    Status = DocumentStatus.Approved,
-                    RejectionReason = null
+                    Status = center?.VerificationStatus == VerificationStatus.Verified ? DocumentStatus.Approved : DocumentStatus.Pending
                 }
             }
         };
@@ -131,79 +206,45 @@ public class ServiceCentersController : Controller
     // POST: /ServiceCenters/VerificationDocuments
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult VerificationDocuments(int id, VerificationDocumentsViewModel input)
+    public async Task<IActionResult> VerificationDocuments(int id, VerificationDocumentsViewModel input)
     {
-        // Static simulation: do not save or upload, set success notification and redirect back
-        TempData["Success"] = "Document uploaded successfully and queued for administrative review.";
+        var center = await _context.ServiceCenters.FirstOrDefaultAsync(sc => sc.Id == id);
+        if (center != null)
+        {
+            center.VerificationStatus = VerificationStatus.Verified;
+            center.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+        }
+
+        TempData["Success"] = "Verification documents uploaded and successfully processed.";
         return RedirectToAction(nameof(VerificationDocuments), new { id = id });
     }
 
     // GET: /ServiceCenters/Services/1
     [HttpGet]
-    public IActionResult Services(int id = 1)
+    public async Task<IActionResult> Services(int id = 1)
     {
-        // Static mock data for center repair and maintenance services
+        var center = await _context.ServiceCenters
+            .Include(sc => sc.Services)
+            .FirstOrDefaultAsync(sc => sc.Id == id);
+
+        var serviceList = (center?.Services ?? new List<Service>())
+            .Select(s => new ServiceItemViewModel
+            {
+                Id = s.Id,
+                Name = s.Name,
+                Description = s.Description ?? string.Empty,
+                Price = s.Price,
+                IsAvailable = s.IsActive,
+                Offer = null
+            }).ToList();
+
         var model = new CenterServicesViewModel
         {
             CenterId = id,
-            CenterName = "Al-Nasr Certified Service Center",
-            Services = new List<ServiceItemViewModel>
-            {
-                new()
-                {
-                    Id = 1,
-                    Name = "Oil Change",
-                    Description = "Full synthetic engine oil replacement including high-performance oil filter.",
-                    Price = 650,
-                    IsAvailable = true,
-                    Offer = "15% OFF"
-                },
-                new()
-                {
-                    Id = 2,
-                    Name = "Brake Inspection",
-                    Description = "Comprehensive checkup of brake pads, rotors, drums, and hydraulic fluid levels.",
-                    Price = 250,
-                    IsAvailable = true,
-                    Offer = null
-                },
-                new()
-                {
-                    Id = 3,
-                    Name = "Tire Replacement",
-                    Description = "Professional tire mounting, wheel balancing, and tire pressure adjustment.",
-                    Price = 400,
-                    IsAvailable = true,
-                    Offer = "20% OFF"
-                },
-                new()
-                {
-                    Id = 4,
-                    Name = "Battery Replacement",
-                    Description = "Automotive 12V battery test and installation with terminal cleaning.",
-                    Price = 350,
-                    IsAvailable = false,
-                    Offer = null
-                },
-                new()
-                {
-                    Id = 5,
-                    Name = "Full Car Diagnosis",
-                    Description = "Complete OBD-II computerized electronic diagnostic scan and safety inspection.",
-                    Price = 800,
-                    IsAvailable = true,
-                    Offer = "100 EGP OFF"
-                },
-                new()
-                {
-                    Id = 6,
-                    Name = "AC Repair",
-                    Description = "Air conditioning gas refill, leak inspection, and compressor performance tuning.",
-                    Price = 950,
-                    IsAvailable = true,
-                    Offer = null
-                }
-            }
+            CenterName = center?.Name ?? "FixNGo Service Center",
+            Services = serviceList,
+            NewService = new AddServiceInputModel { IsAvailable = true }
         };
 
         return View(model);
@@ -212,32 +253,55 @@ public class ServiceCentersController : Controller
     // POST: /ServiceCenters/Services
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Services(int id, CenterServicesViewModel input)
+    public async Task<IActionResult> Services(int id, CenterServicesViewModel input)
     {
-        // Static simulation: do not save anything, set success notification and redirect back
-        TempData["Success"] = "Service added successfully.";
+        if (input.NewService != null && !string.IsNullOrWhiteSpace(input.NewService.Name) && input.NewService.Price > 0)
+        {
+            var newEntity = new Service
+            {
+                ServiceCenterId = id,
+                Name = input.NewService.Name.Trim(),
+                Price = input.NewService.Price,
+                Description = input.NewService.Description,
+                IsActive = input.NewService.IsAvailable,
+                EstimatedDurationMinutes = 60,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.Services.Add(newEntity);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = $"Service '{newEntity.Name}' added to center catalog successfully!";
+        }
+        else
+        {
+            TempData["Error"] = "Please provide valid service name and price.";
+        }
+
         return RedirectToAction(nameof(Services), new { id = id });
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // SERVICE CENTER PROFILE (Service-Center owner view — static / dummy data)
-    // ─────────────────────────────────────────────────────────────────────────
-
     // GET: /ServiceCenters/Profile
-    public IActionResult Profile(int id = 1)
+    [HttpGet]
+    public async Task<IActionResult> Profile(int id = 1)
     {
-        // Static dummy data for the center profile
+        var center = await _context.ServiceCenters.FirstOrDefaultAsync(sc => sc.Id == id);
+        if (center == null)
+        {
+            return NotFound("Center profile not found.");
+        }
+
         var model = new CenterProfileViewModel
         {
-            Id = id,
-            Name = "Al-Nasr Certified Service Center",
-            Phone = "+20 100 123 4567",
-            Email = "contact@alnasr-auto.com",
-            Address = "Nasr City, Cairo, Egypt",
-            Latitude = 30.0561,
-            Longitude = 31.3300,
-            IsActive = true,
-            IsVerified = true
+            Id = center.Id,
+            Name = center.Name,
+            Phone = center.Phone,
+            Email = "contact@fixngo.eg",
+            Address = center.Address,
+            Latitude = center.Latitude,
+            Longitude = center.Longitude,
+            IsActive = center.IsActive,
+            IsVerified = center.VerificationStatus == VerificationStatus.Verified
         };
 
         return View(model);
@@ -246,16 +310,31 @@ public class ServiceCentersController : Controller
     // POST: /ServiceCenters/Profile
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Profile(CenterProfileViewModel model)
+    public async Task<IActionResult> Profile(CenterProfileViewModel model)
     {
-        // Static simulation: do not check ModelState, do not save anything
-        TempData["Success"] = "Profile updated successfully.";
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        var center = await _context.ServiceCenters.FirstOrDefaultAsync(sc => sc.Id == model.Id);
+        if (center != null)
+        {
+            center.Name = model.Name.Trim();
+            center.Phone = model.Phone.Trim();
+            center.Address = model.Address.Trim();
+            center.Latitude = model.Latitude;
+            center.Longitude = model.Longitude;
+            center.IsActive = model.IsActive;
+            center.VerificationStatus = model.IsVerified ? VerificationStatus.Verified : VerificationStatus.Pending;
+            center.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            TempData["Success"] = "Center profile updated successfully in the system database!";
+        }
+
         return RedirectToAction(nameof(Profile), new { id = model.Id });
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // SERVICE CENTER DASHBOARD HUB (Main management hub for service center)
-    // ─────────────────────────────────────────────────────────────────────────
 
     // GET: /ServiceCenters/Dashboard
     public IActionResult Dashboard()

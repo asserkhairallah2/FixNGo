@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace FixNGo.Web.Models;
 
@@ -20,10 +21,20 @@ public class ServiceItemViewModel
 /// </summary>
 public class AddServiceInputModel
 {
+    [Required(ErrorMessage = "Service name is required.")]
+    [StringLength(100, MinimumLength = 3, ErrorMessage = "Service name must be between 3 and 100 characters.")]
     public string Name { get; set; } = string.Empty;
+
+    [StringLength(300, ErrorMessage = "Description cannot exceed 300 characters.")]
     public string? Description { get; set; }
+
+    [Required(ErrorMessage = "Price is required.")]
+    [Range(1, 50000, ErrorMessage = "Price must be between 1 and 50,000 EGP.")]
     public decimal Price { get; set; }
+
     public bool IsAvailable { get; set; } = true;
+
+    [StringLength(50, ErrorMessage = "Offer text cannot exceed 50 characters.")]
     public string? Offer { get; set; }
 }
 
@@ -33,7 +44,7 @@ public class AddServiceInputModel
 public class CenterServicesViewModel
 {
     public int CenterId { get; set; } = 1;
-    public string CenterName { get; set; } = "Al-Nasr Certified Service Center";
+    public string CenterName { get; set; } = "FixNGo Certified Center";
     public List<ServiceItemViewModel> Services { get; set; } = new();
     public AddServiceInputModel NewService { get; set; } = new();
 }

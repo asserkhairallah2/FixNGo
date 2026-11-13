@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using FixNGo.Domain.Enums;
 
 namespace FixNGo.Application.Features.Provider;
@@ -162,12 +163,34 @@ public class ProviderProfileDto
 
 public class UpdateProviderProfileDto
 {
+    [Required(ErrorMessage = "Full Name is required.")]
+    [StringLength(100, MinimumLength = 3, ErrorMessage = "Full Name must be between 3 and 100 characters.")]
+    [Display(Name = "Full Name")]
     public string FullName { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Phone number is required.")]
+    [Phone(ErrorMessage = "Invalid phone number.")]
+    [Display(Name = "Phone Number")]
     public string Phone { get; set; } = string.Empty;
+
+    [Display(Name = "Primary Service Type")]
     public AssistanceType PrimaryServiceType { get; set; }
+
+    [Display(Name = "National ID")]
+    [RegularExpression(@"^[0-9]{14}$", ErrorMessage = "National ID must be 14 digits.")]
     public string? NationalId { get; set; }
+
+    [Display(Name = "Driver License Number")]
     public string? DriverLicenseNumber { get; set; }
+
+    [Display(Name = "Vehicle Plate Number")]
     public string? VehiclePlateNumber { get; set; }
+
+    [Required(ErrorMessage = "City / Region is required.")]
+    [Display(Name = "Operating City")]
     public string? City { get; set; }
+
+    [Display(Name = "Professional Bio")]
+    [StringLength(500, ErrorMessage = "Bio cannot exceed 500 characters.")]
     public string? Bio { get; set; }
 }

@@ -1,0 +1,193 @@
+@model FixNGo.Web.Models.ServiceCenterIndexViewModel
+@{
+    ViewData["Title"] = "Service Centers Directory";
+}
+
+<div class="container py-4">
+    <!-- Breadcrumb & Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 small">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-secondary text-decoration-none">Home</a></li>
+                    <li class="breadcrumb-item active text-body" aria-current="page">Service Centers</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold mb-1">
+                <i class="bi bi-buildings-fill text-primary me-2"></i>Certified Service Centers
+            </h2>
+            <p class="text-secondary mb-0">Browse accredited automotive workshops, check ratings, and schedule your appointment.</p>
+        </div>
+        <div>
+            <a asp-controller="Bookings" asp-action="Dashboard" class="btn btn-outline-primary rounded-3 shadow-sm">
+                <i class="bi bi-calendar-check me-1"></i>My Bookings Queue
+            </a>
+        </div>
+    </div>
+
+    <!-- Search, Filter & Sort Bar -->
+    <div class="card shadow-sm border bg-body-tertiary rounded-4 p-3 mb-4">
+        <form asp-action="Index" method="get" class="row g-3 align-items-end">
+            <!-- Search Text -->
+            <div class="col-md-5">
+                <label class="form-label small fw-semibold text-secondary">Search Centers & Services</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-body border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" name="search" class="form-control border-start-0" placeholder="e.g. Al-Nasr, Brake Inspection, Oil Change..." value="@Model.Search" />
+                </div>
+            </div>
+
+            <!-- City Filter -->
+            <div class="col-md-3">
+                <label class="form-label small fw-semibold text-secondary">Filter by City</label>
+                <select name="city" class="form-select">
+                    <option value="">All Operating Cities</option>
+                    @foreach (var city in Model.AvailableCities)
+                    {
+                        <option value="@city" selected="@(string.Equals(Model.City, city, StringComparison.OrdinalIgnoreCase))">@city</option>
+                    }
+                </select>
+            </div>
+
+            <!-- Sort By -->
+            <div class="col-md-2">
+                <label class="form-label small fw-semibold text-secondary">Sort Results</label>
+                <select name="sortOrder" class="form-select">
+                    <option value="name_asc" selected="@(Model.SortOrder == "name_asc")">Name (A-Z)</option>
+                    <option value="name_desc" selected="@(Model.SortOrder == "name_desc")">Name (Z-A)</option>
+                    <option value="rating_desc" selected="@(Model.SortOrder == "rating_desc")">Top Rated</option>
+                    <option value="rating_asc" selected="@(Model.SortOrder == "rating_asc")">Lowest Rated</option>
+                </select>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary w-100 fw-bold shadow-sm">
+                    <i class="bi bi-funnel me-1"></i>Filter
+                </button>
+                @if (!string.IsNullOrEmpty(Model.Search) || !string.IsNullOrEmpty(Model.City) || !string.IsNullOrEmpty(Model.SortOrder))
+                {
+                    <a asp-action="Index" class="btn btn-outline-secondary" title="Reset Filters">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </a>
+                }
+            </div>
+        </form>
+    </div>
+
+    <!-- Results Grid -->
+    @if (!Model.Items.Any())
+    {
+        <div class="card border bg-body-tertiary rounded-4 shadow-sm p-5 text-center my-4">
+            <i class="bi bi-geo-alt-fill fs-1 text-secondary mb-3 d-block"></i>
+            <h4 class="fw-bold">No Service Centers Found</h4>
+            <p class="text-secondary mb-3">No matching workshops were found for your search criteria.</p>
+            <div>
+                <a asp-action="Index" class="btn btn-outline-primary">View All Centers</a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4 mb-4">
+            @foreach (var center in Model.Items)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border shadow-sm rounded-4 overflow-hidden d-flex flex-column">
+                        <div class="card-header bg-body border-bottom p-3 d-flex justify-content-between align-items-center">
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">
+                                <i class="bi bi-shield-check me-1"></i>@(center.IsVerified ? "Verified Center" : "Pending Verification")
+                            </span>
+                            <div class="d-flex align-items-center text-warning fw-bold small">
+                                <i class="bi bi-star-fill me-1"></i>@center.Rating.ToString("F1")
+                                <span class="text-muted ms-1 font-monospace">(@center.TotalReviews)</span>
+                            </div>
+                        </div>
+
+                        <div class="card-body p-4 flex-grow-1 d-flex flex-column">
+                            <h5 class="fw-bold mb-2">@center.Name</h5>
+                            <p class="text-secondary small mb-3">
+                                <i class="bi bi-geo-alt-fill text-danger me-1"></i>@center.Address, @center.City
+                            </p>
+                            <p class="text-secondary small mb-3">
+                                <i class="bi bi-telephone-fill text-success me-1"></i>@center.Phone
+                            </p>
+
+                            <!-- Services List -->
+                            <div class="mb-3 flex-grow-1">
+                                <span class="fw-semibold small d-block mb-2 text-body">Available Services:</span>
+                                <div class="d-flex flex-wrap gap-1">
+                                    @if (center.Services.Any())
+                                    {
+                                        foreach (var s in center.Services.Take(3))
+                                        {
+                                            <span class="badge bg-secondary bg-opacity-25 text-body small">
+                                                @s.Name (@s.Price.ToString("N0") EGP)
+                                            </span>
+                                        }
+                                        if (center.Services.Count > 3)
+                                        {
+                                            <span class="badge bg-light text-dark small">+@(center.Services.Count - 3) more</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <small class="text-muted">Standard vehicle care available</small>
+                                    }
+                                </div>
+                            </div>
+
+                            <!-- Buttons -->
+                            <div class="d-flex gap-2 pt-3 border-top mt-auto">
+                                <a asp-controller="Bookings" asp-action="Create" asp-route-serviceCenterId="@center.Id" class="btn btn-primary flex-grow-1 fw-bold">
+                                    <i class="bi bi-calendar-plus me-1"></i>Book Service
+                                </a>
+                                <a asp-action="Details" asp-route-id="@center.Id" class="btn btn-outline-secondary">
+                                    Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Pagination Controls -->
+        @if (Model.TotalPages > 1)
+        {
+            <div class="card bg-body-tertiary border rounded-4 p-3 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3">
+                <small class="text-muted">
+                    Showing page <strong>@Model.PageNumber</strong> of <strong>@Model.TotalPages</strong> (Total: @Model.TotalCount service centers)
+                </small>
+                <nav aria-label="Centers Pagination">
+                    <ul class="pagination pagination-sm m-0">
+                        <li class="page-item @(Model.PageNumber <= 1 ? "disabled" : "")">
+                            <a class="page-link" asp-action="Index" 
+                               asp-route-pageNumber="@(Model.PageNumber - 1)" 
+                               asp-route-search="@Model.Search" 
+                               asp-route-city="@Model.City" 
+                               asp-route-sortOrder="@Model.SortOrder">Previous</a>
+                        </li>
+                        @for (int p = 1; p <= Model.TotalPages; p++)
+                        {
+                            <li class="page-item @(p == Model.PageNumber ? "active" : "")">
+                                <a class="page-link" asp-action="Index" 
+                                   asp-route-pageNumber="@p" 
+                                   asp-route-search="@Model.Search" 
+                                   asp-route-city="@Model.City" 
+                                   asp-route-sortOrder="@Model.SortOrder">@p</a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.PageNumber >= Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link" asp-action="Index" 
+                               asp-route-pageNumber="@(Model.PageNumber + 1)" 
+                               asp-route-search="@Model.Search" 
+                               asp-route-city="@Model.City" 
+                               asp-route-sortOrder="@Model.SortOrder">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        }
+    }
+</div>

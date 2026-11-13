@@ -138,6 +138,17 @@ public class ProviderController : Controller
         if (!ModelState.IsValid)
         {
             var profile = await _providerService.GetProfileAsync(providerId, cancellationToken);
+            if (profile != null)
+            {
+                profile.FullName = model.FullName;
+                profile.Phone = model.Phone;
+                profile.PrimaryServiceType = model.PrimaryServiceType;
+                profile.City = model.City;
+                profile.Bio = model.Bio;
+                profile.VehiclePlateNumber = model.VehiclePlateNumber;
+                profile.DriverLicenseNumber = model.DriverLicenseNumber;
+                profile.NationalId = model.NationalId;
+            }
             return View(profile);
         }
 

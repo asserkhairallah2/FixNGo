@@ -1,45 +1,61 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using FixNGo.Infrastructure.Persistence;
 using FixNGo.Domain.Entities;
+using FixNGo.Domain.Enums;
+using FixNGo.Web.Models;
 
 namespace FixNGo.Web.Controllers;
 
 public class BookingsController : Controller
 {
     private readonly AppDbContext _context;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public BookingsController(AppDbContext context)
+    public BookingsController(AppDbContext context, UserManager<ApplicationUser> userManager)
     {
         _context = context;
+        _userManager = userManager;
     }
 
-    // GET: Bookings/Create?serviceCenterId=1
+    // GET: Bookings/Create?serviceCenterId=1&serviceId=2
     [HttpGet]
-    public async Task<IActionResult> Create(int serviceCenterId)
+    public async Task<IActionResult> Create(int serviceCenterId, int? serviceId)
     {
-        // Retrieve the service center along with its offered services
         var serviceCenter = await _context.ServiceCenters
             .Include(sc => sc.Services)
             .FirstOrDefaultAsync(sc => sc.Id == serviceCenterId);
 
         if (serviceCenter == null)
         {
-            return NotFound();
+            return NotFound("Service Center not found.");
         }
 
-        // Pass center name and services to the view via ViewBag
         ViewBag.ServiceCenterName = serviceCenter.Name;
-        ViewBag.Services = serviceCenter.Services;
+        ViewBag.Services = serviceCenter.Services.Where(s => s.IsActive).ToList();
 
-        // Initialize a new booking instance with default values
+        var selectedService = serviceId.HasValue 
+            ? serviceCenter.Services.FirstOrDefault(s => s.Id == serviceId.Value) 
+            : serviceCenter.Services.FirstOrDefault(s => s.IsActive);
+
+        var currentUser = await _userManager.GetUserAsync(User);
+        string customerId = currentUser?.Id ?? "cust-1";
+
         var booking = new Booking
         {
             ServiceCenterId = serviceCenterId,
-            AppointmentDate = DateOnly.FromDateTime(DateTime.Today.AddDays(1))
+            ServiceId = selectedService?.Id ?? 0,
+            Price = selectedService?.Price ?? 0m,
+            CustomerId = customerId,
+            AppointmentDate = DateOnly.FromDateTime(DateTime.Today.AddDays(1)),
+            AppointmentTime = new TimeSpan(10, 0, 0)
         };
 
-        return View("~/Views/ServiceCenters/Create.cshtml", booking);
+        return View(booking);
     }
 
     // POST: Bookings/Create
@@ -47,20 +63,38 @@ public class BookingsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(Booking booking)
     {
-        // Remove navigation properties from ModelState validation to avoid validation errors
         ModelState.Remove(nameof(Booking.ServiceCenter));
         ModelState.Remove(nameof(Booking.Service));
         ModelState.Remove(nameof(Booking.Customer));
 
-        if (ModelState.IsValid)
+        if (string.IsNullOrWhiteSpace(booking.CustomerId))
         {
-            // Add the new booking to the database context and save changes
-            _context.Bookings.Add(booking);
-            await _context.SaveChangesAsync();
-            return RedirectToAction("Index", "ServiceCenters");
+            var currentUser = await _userManager.GetUserAsync(User);
+            booking.CustomerId = currentUser?.Id ?? "cust-1";
         }
 
-        // Reload service center data if model state is invalid
+        if (booking.AppointmentDate < DateOnly.FromDateTime(DateTime.Today))
+        {
+            ModelState.AddModelError(nameof(Booking.AppointmentDate), "Appointment date cannot be in the past.");
+        }
+
+        if (booking.Price <= 0)
+        {
+            ModelState.AddModelError(nameof(Booking.Price), "Price must be greater than 0 EGP.");
+        }
+
+        if (ModelState.IsValid)
+        {
+            booking.Status = BookingStatus.Pending;
+            booking.CreatedAt = DateTime.UtcNow;
+
+            _context.Bookings.Add(booking);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = $"Booking #{booking.Id} has been successfully created and sent to the service center!";
+            return RedirectToAction(nameof(Dashboard));
+        }
+
         var serviceCenter = await _context.ServiceCenters
             .Include(sc => sc.Services)
             .FirstOrDefaultAsync(sc => sc.Id == booking.ServiceCenterId);
@@ -68,41 +102,131 @@ public class BookingsController : Controller
         ViewBag.ServiceCenterName = serviceCenter?.Name;
         ViewBag.Services = serviceCenter?.Services;
 
-        return View("~/Views/ServiceCenters/Create.cshtml", booking);
+        return View(booking);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // BOOKINGS DASHBOARD  (Service-Center owner view — static / dummy data)
-    // ─────────────────────────────────────────────────────────────────────────
-
     // GET: Bookings/Dashboard
-    // Builds a list of 6 hardcoded dummy bookings and passes them to the view.
-    public IActionResult Dashboard()
+    [HttpGet]
+    public async Task<IActionResult> Dashboard(BookingStatus? status, string? search, int pageNumber = 1, int pageSize = 10)
     {
-        // Hardcoded dummy bookings — no database call
-        var bookings = new System.Collections.Generic.List<FixNGo.Web.Models.BookingItemViewModel>
+        var query = _context.Bookings
+            .Include(b => b.ServiceCenter)
+            .Include(b => b.Service)
+            .Include(b => b.Customer)
+            .AsNoTracking()
+            .AsQueryable();
+
+        // Status Counts
+        var allList = await _context.Bookings.AsNoTracking().ToListAsync();
+        var pendingCount = allList.Count(b => b.Status == BookingStatus.Pending);
+        var acceptedCount = allList.Count(b => b.Status == BookingStatus.Confirmed || b.Status == BookingStatus.Completed);
+        var rejectedCount = allList.Count(b => b.Status == BookingStatus.Rejected || b.Status == BookingStatus.Cancelled);
+
+        // Filter by Status
+        if (status.HasValue)
         {
-            new() { Id = 1, CustomerName = "Ahmed Mahmoud",     ServiceName = "Oil Change",          AppointmentDate = "01 Nov 2026", AppointmentTime = "09:00 AM", Price = 350m,  Status = FixNGo.Web.Models.BookingDashboardStatus.Pending  },
-            new() { Id = 2, CustomerName = "Youssef El-Sayed",  ServiceName = "Brake Inspection",    AppointmentDate = "01 Nov 2026", AppointmentTime = "10:30 AM", Price = 200m,  Status = FixNGo.Web.Models.BookingDashboardStatus.Accepted },
-            new() { Id = 3, CustomerName = "Tarek Ibrahim",     ServiceName = "Full Car Diagnosis",  AppointmentDate = "02 Nov 2026", AppointmentTime = "11:00 AM", Price = 500m,  Status = FixNGo.Web.Models.BookingDashboardStatus.Pending  },
-            new() { Id = 4, CustomerName = "Mohamed Hassan",    ServiceName = "Tire Replacement",    AppointmentDate = "02 Nov 2026", AppointmentTime = "01:00 PM", Price = 800m,  Status = FixNGo.Web.Models.BookingDashboardStatus.Accepted },
-            new() { Id = 5, CustomerName = "Omar Abdel-Rahman", ServiceName = "AC Repair",           AppointmentDate = "03 Nov 2026", AppointmentTime = "02:30 PM", Price = 650m,  Status = FixNGo.Web.Models.BookingDashboardStatus.Accepted },
-            new() { Id = 6, CustomerName = "Khaled Mostafa",    ServiceName = "Battery Replacement", AppointmentDate = "03 Nov 2026", AppointmentTime = "04:00 PM", Price = 450m,  Status = FixNGo.Web.Models.BookingDashboardStatus.Rejected },
+            query = query.Where(b => b.Status == status.Value);
+        }
+
+        // Search Filter
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var s = search.Trim().ToLower();
+            query = query.Where(b => (b.Customer != null && b.Customer.FullName.ToLower().Contains(s))
+                                  || (b.Customer != null && b.Customer.PhoneNumber != null && b.Customer.PhoneNumber.Contains(s))
+                                  || (b.ServiceCenter != null && b.ServiceCenter.Name.ToLower().Contains(s))
+                                  || (b.Service != null && b.Service.Name.ToLower().Contains(s))
+                                  || (b.Notes != null && b.Notes.ToLower().Contains(s)));
+        }
+
+        var totalCount = await query.CountAsync();
+        if (pageNumber < 1) pageNumber = 1;
+
+        var dbBookings = await query
+            .OrderByDescending(b => b.CreatedAt)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        var bookingItems = dbBookings.Select(b => new BookingItemViewModel
+        {
+            Id = b.Id,
+            CustomerName = b.Customer?.FullName ?? (string.IsNullOrEmpty(b.CustomerId) ? "Valued Client" : b.CustomerId),
+            ServiceName = b.Service?.Name ?? "General Vehicle Maintenance",
+            ServiceCenterName = b.ServiceCenter?.Name ?? "FixNGo Center",
+            AppointmentDate = b.AppointmentDate.ToString("dd MMM yyyy"),
+            AppointmentTime = b.AppointmentTime.ToString(@"hh\:mm"),
+            Price = b.Price,
+            RawStatus = b.Status,
+            Notes = b.Notes,
+            Status = b.Status switch
+            {
+                BookingStatus.Pending => BookingDashboardStatus.Pending,
+                BookingStatus.Confirmed => BookingDashboardStatus.Accepted,
+                BookingStatus.Completed => BookingDashboardStatus.Accepted,
+                BookingStatus.Rejected => BookingDashboardStatus.Rejected,
+                BookingStatus.Cancelled => BookingDashboardStatus.Rejected,
+                _ => BookingDashboardStatus.Pending
+            }
+        }).ToList();
+
+        var model = new BookingsDashboardViewModel
+        {
+            Bookings = bookingItems,
+            CurrentStatus = status,
+            CurrentSearch = search,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalCount = totalCount,
+            TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
+            PendingCount = pendingCount,
+            AcceptedCount = acceptedCount,
+            RejectedCount = rejectedCount
         };
 
-        var model = new FixNGo.Web.Models.BookingsDashboardViewModel { Bookings = bookings };
         return View(model);
     }
 
-    // POST: Bookings/Dashboard
-    // Receives the booking id and action type ("Accept" or "Reject").
-    // Does NOT save anything — only sets a success message and redirects.
+    // POST: Bookings/Dashboard or Bookings/UpdateStatus
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Dashboard(int bookingId, string actionType)
+    public async Task<IActionResult> Dashboard(int bookingId, string actionType)
     {
-        // Build a friendly confirmation message for the owner
-        TempData["Success"] = $"Booking #{bookingId} {actionType.ToLower()}ed.";
+        var booking = await _context.Bookings.FirstOrDefaultAsync(b => b.Id == bookingId);
+        if (booking == null)
+        {
+            return NotFound("Booking not found.");
+        }
+
+        switch (actionType?.ToLowerInvariant())
+        {
+            case "accept":
+            case "confirm":
+                booking.Confirm();
+                TempData["Success"] = $"Booking #{bookingId} has been confirmed successfully.";
+                break;
+
+            case "reject":
+                booking.Reject("Rejected by service center due to slot unavailability.");
+                TempData["Success"] = $"Booking #{bookingId} has been rejected.";
+                break;
+
+            case "complete":
+                booking.Complete();
+                TempData["Success"] = $"Booking #{bookingId} has been marked as Completed.";
+                break;
+
+            case "cancel":
+                booking.Cancel("Cancelled upon customer request.");
+                TempData["Success"] = $"Booking #{bookingId} has been cancelled.";
+                break;
+
+            default:
+                TempData["Error"] = "Unknown booking action.";
+                break;
+        }
+
+        await _context.SaveChangesAsync();
         return RedirectToAction(nameof(Dashboard));
     }
 }

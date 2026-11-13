@@ -426,6 +426,14 @@ public class TowProviderController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult Profile(TowProviderProfileViewModel model)
     {
+        if (!ModelState.IsValid)
+        {
+            model.Documents = _profile.Documents;
+            model.VerificationStatus = _profile.VerificationStatus;
+            model.Email = _profile.Email;
+            return View(model);
+        }
+
         _profile.FullName = model.FullName;
         _profile.PhoneNumber = model.PhoneNumber;
         _profile.City = model.City;

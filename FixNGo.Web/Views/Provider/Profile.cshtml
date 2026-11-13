@@ -112,17 +112,20 @@
 
             <form asp-action="Profile" method="post">
                 @Html.AntiForgeryToken()
+                <div asp-validation-summary="All" class="text-danger small mb-3"></div>
 
                 <!-- Section: Personal Info -->
                 <h6 class="text-secondary small fw-bold text-uppercase mb-3">1. Personal & Contact Information</h6>
                 <div class="row g-3 mb-4">
                     <div class="col-md-6">
-                        <label for="fullName" class="form-label fw-semibold small">Full Name</label>
-                        <input type="text" name="FullName" id="fullName" class="form-control" value="@Model.FullName" required />
+                        <label asp-for="FullName" class="form-label fw-semibold small">Full Name</label>
+                        <input asp-for="FullName" class="form-control" />
+                        <span asp-validation-for="FullName" class="text-danger small"></span>
                     </div>
                     <div class="col-md-6">
-                        <label for="phone" class="form-label fw-semibold small">Contact Mobile Number</label>
-                        <input type="tel" name="Phone" id="phone" class="form-control" value="@Model.Phone" required />
+                        <label asp-for="Phone" class="form-label fw-semibold small">Contact Mobile Number</label>
+                        <input asp-for="Phone" class="form-control" />
+                        <span asp-validation-for="Phone" class="text-danger small"></span>
                     </div>
                     <div class="col-12">
                         <label class="form-label fw-semibold small">Account Email (Verified)</label>
@@ -135,21 +138,19 @@
                 <h6 class="text-secondary small fw-bold text-uppercase mb-3">2. Service & Coverage</h6>
                 <div class="row g-3 mb-4">
                     <div class="col-md-6">
-                        <label for="primaryService" class="form-label fw-semibold small">Primary Assistance Specialization</label>
-                        <select name="PrimaryServiceType" id="primaryService" class="form-select">
-                            @foreach (var type in Enum.GetValues<AssistanceType>())
-                            {
-                                <option value="@type" selected="@(type == Model.PrimaryServiceType)">@type</option>
-                            }
-                        </select>
+                        <label asp-for="PrimaryServiceType" class="form-label fw-semibold small">Primary Assistance Specialization</label>
+                        <select asp-for="PrimaryServiceType" asp-items="Html.GetEnumSelectList<AssistanceType>()" class="form-select"></select>
+                        <span asp-validation-for="PrimaryServiceType" class="text-danger small"></span>
                     </div>
                     <div class="col-md-6">
-                        <label for="city" class="form-label fw-semibold small">Primary Operating Region</label>
-                        <input type="text" name="City" id="city" class="form-control" value="@Model.City" placeholder="e.g. Cairo - Desert Road Km 28" />
+                        <label asp-for="City" class="form-label fw-semibold small">Primary Operating Region</label>
+                        <input asp-for="City" class="form-control" placeholder="e.g. Cairo - Desert Road Km 28" />
+                        <span asp-validation-for="City" class="text-danger small"></span>
                     </div>
                     <div class="col-12">
-                        <label for="bio" class="form-label fw-semibold small">Professional Bio / Equipment Summary</label>
-                        <textarea name="Bio" id="bio" rows="3" class="form-control" placeholder="Describe your mechanical expertise, tools, and roadside assistance capabilities...">@Model.Bio</textarea>
+                        <label asp-for="Bio" class="form-label fw-semibold small">Professional Bio / Equipment Summary</label>
+                        <textarea asp-for="Bio" rows="3" class="form-control" placeholder="Describe your mechanical expertise, tools, and roadside assistance capabilities..."></textarea>
+                        <span asp-validation-for="Bio" class="text-danger small"></span>
                     </div>
                 </div>
 
@@ -157,16 +158,19 @@
                 <h6 class="text-secondary small fw-bold text-uppercase mb-3">3. Verification & Equipment Identifiers (SAD UC-02)</h6>
                 <div class="row g-3 mb-4">
                     <div class="col-md-4">
-                        <label for="plate" class="form-label fw-semibold small">Tow / Service Van Plate</label>
-                        <input type="text" name="VehiclePlateNumber" id="plate" class="form-control" value="@Model.VehiclePlateNumber" placeholder="e.g. ق أ ج 4921" />
+                        <label asp-for="VehiclePlateNumber" class="form-label fw-semibold small">Tow / Service Van Plate</label>
+                        <input asp-for="VehiclePlateNumber" class="form-control" placeholder="e.g. ق أ ج 4921" />
+                        <span asp-validation-for="VehiclePlateNumber" class="text-danger small"></span>
                     </div>
                     <div class="col-md-4">
-                        <label for="license" class="form-label fw-semibold small">Driver / Trade License</label>
-                        <input type="text" name="DriverLicenseNumber" id="license" class="form-control" value="@Model.DriverLicenseNumber" placeholder="e.g. DL-882941" />
+                        <label asp-for="DriverLicenseNumber" class="form-label fw-semibold small">Driver / Trade License</label>
+                        <input asp-for="DriverLicenseNumber" class="form-control" placeholder="e.g. DL-882941" />
+                        <span asp-validation-for="DriverLicenseNumber" class="text-danger small"></span>
                     </div>
                     <div class="col-md-4">
-                        <label for="nationalId" class="form-label fw-semibold small">National ID Number</label>
-                        <input type="text" name="NationalId" id="nationalId" class="form-control" value="@Model.NationalId" placeholder="14-digit National ID" />
+                        <label asp-for="NationalId" class="form-label fw-semibold small">National ID Number</label>
+                        <input asp-for="NationalId" class="form-control" placeholder="14-digit National ID" />
+                        <span asp-validation-for="NationalId" class="text-danger small"></span>
                     </div>
                 </div>
 
@@ -182,30 +186,5 @@
 </div>
 
 @section Scripts {
-    <script>
-        document.querySelector("form[action*='Profile']")?.addEventListener("submit", function (e) {
-            const nameInput = document.getElementById("fullName");
-            const phoneInput = document.getElementById("phone");
-            let isValid = true;
-
-            if (!nameInput.value || nameInput.value.trim().length < 3) {
-                nameInput.classList.add("is-invalid");
-                isValid = false;
-            } else {
-                nameInput.classList.remove("is-invalid");
-            }
-
-            if (!phoneInput.value || phoneInput.value.trim().length < 7) {
-                phoneInput.classList.add("is-invalid");
-                isValid = false;
-            } else {
-                phoneInput.classList.remove("is-invalid");
-            }
-
-            if (!isValid) {
-                e.preventDefault();
-                alert("Please correct the highlighted fields before submitting.");
-            }
-        });
-    </script>
+    <partial name="_ValidationScriptsPartial" />
 }

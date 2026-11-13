@@ -75,6 +75,7 @@
         <div class="card-body p-4">
             <form asp-action="Profile" method="post">
                 @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
                 <input type="hidden" asp-for="Id" />
                 <input type="hidden" asp-for="IsVerified" />
 
@@ -87,6 +88,7 @@
                         </span>
                         <input asp-for="Name" class="form-control" placeholder="Enter center name" required />
                     </div>
+                    <span asp-validation-for="Name" class="text-danger small"></span>
                 </div>
 
                 <!-- Contact Info: Phone & Email -->
@@ -99,6 +101,7 @@
                             </span>
                             <input asp-for="Phone" class="form-control" placeholder="e.g. +20 100 123 4567" required />
                         </div>
+                        <span asp-validation-for="Phone" class="text-danger small"></span>
                     </div>
                     <div class="col-md-6">
                         <label asp-for="Email" class="form-label fw-semibold text-body">Email Address</label>
@@ -108,6 +111,7 @@
                             </span>
                             <input asp-for="Email" type="email" class="form-control" placeholder="e.g. contact@domain.com" required />
                         </div>
+                        <span asp-validation-for="Email" class="text-danger small"></span>
                     </div>
                 </div>
 
@@ -120,6 +124,7 @@
                         </span>
                         <input asp-for="Address" class="form-control" placeholder="Enter street and city address" required />
                     </div>
+                    <span asp-validation-for="Address" class="text-danger small"></span>
                 </div>
 
                 <!-- Location Coordinates & Static Map Preview -->
@@ -182,3 +187,7 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

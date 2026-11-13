@@ -1,0 +1,192 @@
+@model FixNGo.Web.ViewModels.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Overview - FixNGo";
+}
+
+<partial name="_AdminNav" />
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["Warning"] != null)
+{
+    <div class="alert alert-warning alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Warning"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+        <i class="bi bi-x-circle-fill me-2"></i>@TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold m-0"><i class="bi bi-speedometer2 text-danger me-2"></i>Platform Overview & Governance</h3>
+        <p class="text-secondary m-0">Monitor real-time operations, coordinate clients and providers, and verify applications.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Requests" class="btn btn-outline-danger btn-sm px-3">
+            <i class="bi bi-telephone-inbound me-1"></i>Active Dispatch
+        </a>
+        <a asp-action="Providers" class="btn btn-danger btn-sm px-3 fw-bold">
+            <i class="bi bi-patch-check me-1"></i>Review Applications (@Model.PendingVerificationsCount)
+        </a>
+    </div>
+</div>
+
+<!-- Key Performance Metrics (Cards) -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="card border-0 shadow-sm rounded-3 p-3 bg-body-tertiary">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-secondary small fw-semibold text-uppercase">Platform Users</span>
+                <span class="p-2 rounded-circle bg-primary bg-opacity-10 text-primary"><i class="bi bi-people-fill"></i></span>
+            </div>
+            <h3 class="fw-bold mb-1">@Model.TotalUsersCount</h3>
+            <small class="text-success"><i class="bi bi-arrow-up-right me-1"></i>Clients &amp; Providers</small>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card border-0 shadow-sm rounded-3 p-3 bg-body-tertiary">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-secondary small fw-semibold text-uppercase">Verified Providers</span>
+                <span class="p-2 rounded-circle bg-warning bg-opacity-10 text-warning"><i class="bi bi-tools"></i></span>
+            </div>
+            <h3 class="fw-bold mb-1">@Model.TotalProvidersCount</h3>
+            <small class="text-warning"><i class="bi bi-clock-history me-1"></i>@Model.PendingVerificationsCount Pending Review</small>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card border-0 shadow-sm rounded-3 p-3 bg-body-tertiary">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-secondary small fw-semibold text-uppercase">Center Bookings</span>
+                <span class="p-2 rounded-circle bg-success bg-opacity-10 text-success"><i class="bi bi-calendar-check-fill"></i></span>
+            </div>
+            <h3 class="fw-bold mb-1">@Model.TotalBookingsCount</h3>
+            <small class="text-muted"><i class="bi bi-buildings me-1"></i>Across @Model.TotalServiceCentersCount Centers</small>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card border-0 shadow-sm rounded-3 p-3 bg-body-tertiary">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-secondary small fw-semibold text-uppercase">Emergency Requests</span>
+                <span class="p-2 rounded-circle bg-danger bg-opacity-10 text-danger"><i class="bi bi-cone-striped"></i></span>
+            </div>
+            <h3 class="fw-bold mb-1">@Model.TotalAssistanceRequestsCount</h3>
+            <small class="text-danger"><i class="bi bi-broadcast me-1"></i>@Model.ActiveMissionsCount In Progress</small>
+        </div>
+    </div>
+</div>
+
+<!-- Two Column Layout: Recent Emergency Requests vs Recent Bookings -->
+<div class="row g-4">
+    <!-- Recent Emergency Assistance Requests -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-transparent py-3 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold m-0"><i class="bi bi-telephone-inbound text-danger me-2"></i>Recent Roadside Dispatches</h5>
+                <a asp-action="Requests" class="btn btn-sm btn-link text-decoration-none">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light small text-uppercase">
+                            <tr>
+                                <th>Ticket</th>
+                                <th>Client / Service</th>
+                                <th>Status</th>
+                                <th>Fare</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!Model.RecentRequests.Any())
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center py-4 text-muted">No roadside assistance requests found.</td>
+                                </tr>
+                            }
+                            @foreach (var req in Model.RecentRequests)
+                            {
+                                <tr>
+                                    <td>
+                                        <span class="fw-bold">#REQ-@req.Id</span>
+                                        <small class="d-block text-muted">@req.CreatedAt.ToString("HH:mm")</small>
+                                    </td>
+                                    <td>
+                                        <div class="fw-semibold">@(req.Customer?.FullName ?? req.CustomerId)</div>
+                                        <small class="text-muted">@req.ServiceType • @req.CustomerAddress</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary-subtle text-body border">@req.Status</span>
+                                    </td>
+                                    <td class="fw-bold text-success">
+                                        @req.EstimatedFare.ToString("N0") EGP
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Center Appointments -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-transparent py-3 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold m-0"><i class="bi bi-calendar2-check text-success me-2"></i>Recent Service Bookings</h5>
+                <a asp-action="Bookings" class="btn btn-sm btn-link text-decoration-none">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light small text-uppercase">
+                            <tr>
+                                <th>Booking</th>
+                                <th>Center / Service</th>
+                                <th>Status</th>
+                                <th>Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!Model.RecentBookings.Any())
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center py-4 text-muted">No appointments booked yet.</td>
+                                </tr>
+                            }
+                            @foreach (var b in Model.RecentBookings)
+                            {
+                                <tr>
+                                    <td>
+                                        <span class="fw-bold">#BK-@b.Id</span>
+                                        <small class="d-block text-muted">@b.AppointmentDate.ToString("yyyy-MM-dd")</small>
+                                    </td>
+                                    <td>
+                                        <div class="fw-semibold">@(b.ServiceCenter?.Name ?? "Center #" + b.ServiceCenterId)</div>
+                                        <small class="text-muted">@(b.Service?.Name ?? "Service #" + b.ServiceId)</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary-subtle text-body border">@b.Status</span>
+                                    </td>
+                                    <td class="fw-bold text-success">
+                                        @b.Price.ToString("N0") EGP
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

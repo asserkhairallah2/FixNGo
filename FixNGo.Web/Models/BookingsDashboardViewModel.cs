@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
+using FixNGo.Domain.Enums;
 
 namespace FixNGo.Web.Models;
 
-/// <summary>
-/// Status of an incoming service center appointment booking.
-/// </summary>
 public enum BookingDashboardStatus
 {
     Pending,
@@ -13,31 +11,34 @@ public enum BookingDashboardStatus
     Rejected
 }
 
-/// <summary>
-/// Represents a single appointment booking entry for the service center owner.
-/// </summary>
 public class BookingItemViewModel
 {
     public int Id { get; set; }
     public string CustomerName { get; set; } = string.Empty;
     public string ServiceName { get; set; } = string.Empty;
+    public string ServiceCenterName { get; set; } = string.Empty;
     public string AppointmentDate { get; set; } = string.Empty;
     public string AppointmentTime { get; set; } = string.Empty;
     public decimal Price { get; set; }
     public BookingDashboardStatus Status { get; set; }
+    public BookingStatus RawStatus { get; set; }
+    public string? Notes { get; set; }
 }
 
-/// <summary>
-/// View model for the complete Bookings Dashboard page.
-/// </summary>
 public class BookingsDashboardViewModel
 {
     public int ServiceCenterId { get; set; } = 1;
-    public string CenterName { get; set; } = "Al-Nasr Certified Service Center";
+    public string CenterName { get; set; } = "FixNGo Certified Centers";
     public List<BookingItemViewModel> Bookings { get; set; } = new();
 
-    public int TotalCount => Bookings.Count;
-    public int PendingCount => Bookings.FindAll(b => b.Status == BookingDashboardStatus.Pending).Count;
-    public int AcceptedCount => Bookings.FindAll(b => b.Status == BookingDashboardStatus.Accepted).Count;
-    public int RejectedCount => Bookings.FindAll(b => b.Status == BookingDashboardStatus.Rejected).Count;
+    public BookingStatus? CurrentStatus { get; set; }
+    public string? CurrentSearch { get; set; }
+    public int PageNumber { get; set; } = 1;
+    public int PageSize { get; set; } = 10;
+    public int TotalCount { get; set; }
+    public int TotalPages { get; set; }
+
+    public int PendingCount { get; set; }
+    public int AcceptedCount { get; set; }
+    public int RejectedCount { get; set; }
 }
